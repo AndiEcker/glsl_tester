@@ -1,0 +1,6 @@
+[
+  "tests/test_transfer_service.py::TestHelpers::test_transfer_kwargs_literal_basics",
+  "tests/test_transfer_service.py::TestHelpers::test_transfer_kwargs_literal_date_time",
+  "tests/test_transfer_service.py::TestHelpers::test_transfer_service_from_literal_basics",
+  "tests/test_transfer_service.py::TestHelpers::test_transfer_service_from_literal_date_time"
+]

@@ -1,0 +1,36 @@
+{
+#==================================
+#---- OVERWRITING ae.gui_help -----
+"help_app_state#sound_volume": """\
+change sound volume
+
+tap all to the left
+to mute all sounds and to hide
+all shader animations.
+
+current value: [b]{round(state_value * 100)}%[/b]
+
+In this demo app this value
+also affects the opacity of
+the shader animations.
+""",
+#----------------------------------
+#---- OVERWRITING ae.gui_help -----
+"help_app_state#vibration_volume": """\
+vibration intensity
+
+tap all to the left for
+to mute all vibrations.
+
+current vibration: {round(state_value * 100)}%
+
+In this demo app this value
+also affects the color contrast
+of the shader animations.""",
+#==================================
+#---- OVERWRITING ae.gui_help -----
+"flow_id_ink": "{'color of the ' if app.landscape else ''}transfer service background animation",
+"flow_path_ink": "{'color of the ' if app.landscape else ''}sideloading background animation",
+"selected_item_ink": "{'color of the ' if app.landscape else ''}transfer service progress animation",
+"unselected_item_ink": "{'color of the ' if app.landscape else ''}sideloading server progress animation",
+}

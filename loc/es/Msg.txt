@@ -1,0 +1,68 @@
+{
+#==================================
+#---- OVERWRITING ae.gui_help -----
+"help_app_state#sound_volume": """\
+volumen de sonidos
+
+para silenciar todos los sonidos puntea
+a la izquierda.
+
+volumen actual: {round(state_value * 100)}%
+
+Especialmente en esta app el valor
+afecta también la transparencia de la
+animación mostrado en el fondo.""",
+#----------------------------------
+#---- OVERWRITING ae.gui_help -----
+"help_app_state#vibration_volume": """\
+intensidad vibración
+
+para silenciar todos los
+vibraciones puntea a la
+izquierda.
+
+vibración actual: {round(state_value * 100)}%
+
+Especialmente en esta app
+el valor afecta también la
+intensidad de los colores
+de la animación mostrado
+en el fondo.""",
+#==================================
+#---- OVERWRITING ae.gui_help -----
+"flow_id_ink": "{'color de la ' if app.landscape else ''}animación del servicio transfer en el fondo",
+"flow_path_ink": "{'color de la ' if app.landscape else ''}animación de la descarga lateral en el fondo",
+"selected_item_ink": "{'color de la ' if app.landscape else ''}animación del progreso del servicio transfer",
+"unselected_item_ink": "{'color de la ' if app.landscape else ''}animación del progreso de la descarga lateral",
+#----------------------------------
+"all": "todo",
+"cancel transfer request": "cancelar transmisión",
+"confirm request task type to clear": "Selecciona tipo de entradas para borrar",
+"file": "transmisión",
+"Folders can't be transferred": "No se puede transferir carpetas",
+"local ip": "ip local",
+"log": "registro",
+"message": "mensaje",
+"prepare resend": "preperar reenvio",
+"recover send request": "seguir transmisión",
+"request task data": "Datos del Registro",
+"Select Single File": "Selecciona un fichero",
+#----------------------------------
+#---- move to kivy_qr_displayer ---
+"\nEither manually type/copy the window title string or use a QR code reader.":
+    "\nEscriba/Copie manualmente la cadena del título de esta ventana o utilice un lector de códigos QR.",
+"\n\nTap outside of this window for to close it.":
+    "\n\nToque fuera de esta ventana para cerrarla.",
+"The {root.qr_content} shown in the window title is underneath encoded as QR code.":
+    "La {root.qr_content} que se muestra en el título de la ventana está codificado debajo como código QR.",
+#----------------------------------
+#---- move to kivy_sideloading ----
+"display sideloading address/QR code": "mostrar dirección/QR-code del servidor de descarga lateral",
+"folders can't be send via sideloading": "las carpetas no se pueden enviar mediante la descarga lateral",
+"select file for sideloading": "selecciona fichero para la descarga lateral",
+"select single file": "selecciona un solo fichero",
+"sideloading file info": "información del fichero de descarga lateral",
+"sideloading url": "dirección de descarga lateral",
+"start sideloading server": "comienzo el servidor de descarga lateral",
+"stop sideloading server": "detener el servidor de descarga lateral",
+}

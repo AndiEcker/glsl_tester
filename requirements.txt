@@ -1,0 +1,3 @@
+kivy
+ae_kivy_app
+ae_kivy_user_prefs      # hidden python dependency via main.kv

@@ -1,0 +1,251 @@
+# user interface of app. Main is the widget tree root layout.
+
+#: import os os
+#: import _z_ kivy_garden.zbarcam
+#: import os_local_ip ae.base.os_local_ip
+#: import touch_shader ae.kivy_glsl.circled_alpha_shader_code
+# import touch_shader ae.kivy_glsl.touch_wave_shader_code
+#: import _s_ ae.kivy_sideloading
+#: import _u_ ae.kivy_user_prefs
+
+
+<Main@ShadersMixin+BoxLayout>
+    orientation: 'vertical'
+    on_touch_down:
+        args[1].ud['render_idx'] = app.main_app.add_shader(shader_code=touch_shader, alpha=1.0, \
+        center_pos=lambda: (args[1].x, args[1].y), \
+        tint_ink=(1.0 - args[1].y / Window.height, 1.0 - args[1].y / Window.height, \
+        0.3 + args[1].y * 0.69 / Window.height, 0.3 + args[1].x * 0.69 / Window.width))
+    on_touch_up:
+        if 'render_idx' in args[1].ud: root.del_renderer(args[1].ud['render_idx']); args[1].ud['render_idx'] = -1
+    BoxLayout:
+        size_hint_y: None
+        height: app.app_states['font_size'] * 1.5
+        spacing: '3sp'
+        HelpToggler:
+            relief_ellipse_inner_colors: relief_colors()
+            relief_ellipse_inner_lines: int(self.height / 2.1)
+        UserPreferencesButton:
+            size_hint_x: None
+            width: self.height
+            relief_ellipse_inner_colors: relief_colors()
+            relief_ellipse_inner_lines: int(self.height / 2.1)
+        AnimFlowButton:
+            tap_flow_id: id_of_flow('select', 'current_object')
+            tap_kwargs:
+                update_tap_kwargs(self, popup_kwargs=dict(child_data_maps=[dict(kwargs=dict( \
+                text=his, tap_flow_id=id_of_flow('change', 'current', 'current_object'), \
+                tap_kwargs=dict(popups_to_close=('replace_with_data_map_container', )) \
+                )) for his in app.app_states['current_object_history']]))
+            text: app.app_states['current_object']
+            relief_square_inner_colors: relief_colors()
+            relief_square_inner_lines: int(self.height / 3.6)
+        FlowButton:
+            tap_flow_id: id_of_flow('select', 'current_remote')
+            tap_kwargs:
+                update_tap_kwargs(self, popup_kwargs=dict(child_data_maps=[dict(kwargs=dict( \
+                text=his, tap_flow_id=id_of_flow('change', 'current', 'current_remote'), \
+                tap_kwargs=dict(popups_to_close=('replace_with_data_map_container', )) \
+                )) for his in app.app_states['current_remote_history']]))
+            text: app.app_states['current_remote'].split('.')[-1]
+            size_hint_x: 0.12
+            on_alt_tap: app.main_app.change_flow(id_of_flow('open', 'qr_scanner'))
+            relief_square_inner_colors: relief_colors()
+            relief_square_inner_lines: int(self.height / 3.6)
+        SendObjectButton:
+            visible: not tool_box.visible and object_input.text and remote_input.text
+        FlowToggler:
+            tap_flow_id: id_of_flow('toggle', 'tool_box')
+            text: "^" if tool_box.visible else "v"
+            size_hint_x: None
+            width: self.height
+            relief_ellipse_inner_colors: relief_colors()
+            relief_ellipse_inner_lines: int(self.height / 2.1)
+        SideloadingButton:
+            id: sideloading_button
+    Widget:
+        size_hint_y: None
+        height: '6sp'
+    BoxLayout:
+        id: tool_box
+        visible: True
+        disabled: not self.visible
+        size_hint_y: None
+        height: round(3.69 * app.app_states['font_size']) if self.visible else 0
+        orientation: 'vertical'
+        padding: '6sp'
+        spacing: '3sp'
+        canvas:
+            Color:
+                rgba: app.font_color[:3] + (0.369 if tool_box.visible else 0.0, )
+            RoundedRectangle:
+                pos: self.pos
+                size: self.size
+            Color:
+                rgba: app.font_color[:3] + (0.69 if tool_box.visible else 0.0, )
+            Line:
+                width: sp(0.9)
+                rounded_rectangle: self.x + 1, self.y + 1, self.width - 2, self.height - 2, sp(9)
+        BoxLayout:
+            spacing: '3sp'
+            FlowInput:
+                id: object_input
+                background_color: self.background_color[:3] + [1.0 if tool_box.visible else 0.0]
+                text: app.app_states['current_object']
+                on_text: app.main_app.change_app_state('current_object', self.text)
+                auto_complete_texts: file_lines(norm_path("{ado}/SendObjectSuggestions.txt"))
+                on_auto_complete_texts:
+                    write_file_text(self.auto_complete_texts, norm_path("{ado}/SendObjectSuggestions.txt"))
+            OptionalButton:
+                tap_flow_id: id_of_flow('open', 'file_chooser')
+                tap_kwargs:
+                    update_tap_kwargs(self, popup_kwargs=dict(
+                    initial_path=app.app_states['file_chooser_initial_path'] or norm_path("{pictures}") or ".", \
+                    submit_to='current_object'))
+                text: "..."
+                size_hint_x: None
+                width: self.height
+                visible: tool_box.visible
+                relief_ellipse_inner_colors: relief_colors()
+                relief_ellipse_inner_lines: int(self.height / 2.1)
+        BoxLayout:
+            spacing: '3sp'
+            OptionalButton:
+                tap_flow_id: id_of_flow('open', 'qr_displayer')
+                tap_kwargs: update_tap_kwargs(self, popup_kwargs=dict(title=os_local_ip(), qr_content=_("local ip")))
+                text: os_local_ip().split('.')[-1] + "->"
+                size_hint_x: 0.45 if app.landscape else 0.3
+                visible: tool_box.visible
+                relief_ellipse_inner_colors: relief_colors()
+                relief_ellipse_inner_lines: int(self.height / 2.1)
+            FlowInput:
+                id: remote_input
+                background_color: self.background_color[:3] + [1.0 if tool_box.visible else 0.0]
+                size_hint_min_x: sp(33)
+                text: app.app_states['current_remote']
+                on_text: app.main_app.change_app_state('current_remote', self.text)
+                on_double_tap: app.main_app.change_flow(id_of_flow('open', 'qr_scanner'))
+                auto_complete_texts: file_lines(norm_path("{ado}/SendRemoteSuggestions.txt"))
+                on_auto_complete_texts:
+                    write_file_text(self.auto_complete_texts, norm_path("{ado}/SendRemoteSuggestions.txt"))
+            SendObjectButton:
+                visible: tool_box.visible and object_input.text and remote_input.text
+            FlowToggler:
+                id: close_on_send
+                tap_flow_id: id_of_flow('toggle', 'close_on_send')
+                text: "X" if self.state == 'down' else "_"
+                size_hint_x: None
+                width: self.height
+                state: 'down' if app.app_states['close_toolbox_on_send'] else 'normal'
+                on_state: app.main_app.change_app_state('close_toolbox_on_send', self.state == 'down')
+                relief_ellipse_inner_colors: relief_colors() if tool_box.visible else ()
+                relief_ellipse_inner_lines: int(self.height / 2.1)
+            OptionalButton:
+                tap_flow_id: id_of_flow('fetch', 'pending_requests')
+                visible:
+                    app.app_states['pending_requests_frequency'] \
+                    == app.main_app.get_var('pending_requests_frequency_min')
+                text: "Fetch Pending Requests manually"
+                size_hint_x: 0.69
+            OptionalButton:
+                tap_flow_id: id_of_flow('confirm', 'request_tasks_clean')
+                icon_name: id_of_flow('delete', 'item')
+                visible: tool_box.visible and request_tasks_view.data
+                size_hint_x: None
+                width: self.height
+    RecycleView:
+        id: request_tasks_view
+        viewclass: 'RequestTaskItem'
+        key_size: 'height'
+        RecycleBoxLayout:
+            default_size: None, None
+            default_size_hint: 1, None
+            size_hint_y: None
+            height: self.minimum_height
+            orientation: 'vertical'
+            padding: '9sp'
+            spacing: '3sp'
+
+
+<UserPreferencesPopup>:
+    AppStateSlider:
+        app_state_name: 'pending_requests_frequency'
+        cursor_image:
+            app.main_app.img_file('timer_frequency', app.app_states['font_size'], app.app_states['light_theme'])
+        min: app.main_app.get_var('pending_requests_frequency_min')
+        max: app.main_app.get_var('pending_requests_frequency_max')
+
+
+<AnimFlowButton@FlowButton+AutoFontSizeBehavior+SimpleAutoTickerBehavior>
+    auto_ticker_length_anim_duration: 2.1
+
+
+<CurrentObjectSelectPopup@FlowDropDown>
+
+<CurrentRemoteSelectPopup@FlowDropDown>
+
+<SendObjectButton@OptionalButton>
+    tap_flow_id: id_of_flow('send', 'object')
+    icon_name: id_of_flow('send', 'item')
+    size_hint_x: None
+    width: self.height * (2.7 if app.landscape else 1.5)
+    disabled:
+        not app.app_states['current_object'] or not app.app_states['current_remote'] \
+        or (not app.main_app.debug and app.app_states['current_remote'] == os_local_ip())
+    relief_ellipse_inner_colors: relief_colors()
+    relief_ellipse_inner_lines: int(self.height / 2.1)
+
+
+<RequestTaskItem>
+    tap_flow_id:
+        id_of_flow('open',
+        'iterable_displayer' if flow_object(self.data['rt_id']) == 'log' else 'request_task_menu',
+        self.data['rt_id'])
+    tap_kwargs: update_tap_kwargs(self, popup_kwargs=dict(title=self.text[:42], data=self.data))
+    progress_x:
+        self.width * self.data['transferred_bytes'] / self.data['total_bytes'] if 'total_bytes' in self.data else 0
+    text_size: self.size
+    halign: 'left'
+    shorten: True
+    shorten_from: 'right'
+    square_fill_ink:
+        app.app_states[('' if self.data and flow_object(self.data['rt_id']) == 'file' \
+        else 'un') + 'selected_item_ink']
+    square_fill_size: max(sp(69), self.progress_x) if 'transferred_bytes' in self.data else 0, self.height
+
+<RequestTaskMenuPopup>
+
+<RequestTasksCleanConfirmPopup@FlowPopup>
+    title: _("confirm request task type to clear")
+    size_hint_y: None
+    height: int(4.8 * app.main_app.font_size)
+    BoxLayout:
+        RequestTasksCleanButton:
+            what: 'all'
+        RequestTasksCleanButton:
+            what: 'message'
+        RequestTasksCleanButton:
+            what: 'file'
+        RequestTasksCleanButton:
+            what: 'sideloading'
+        RequestTasksCleanButton:
+            what: 'log'
+
+<RequestTasksCleanButton@FlowButton>
+    what: ''
+    tap_flow_id: id_of_flow('clear', 'request_tasks', self.what)
+    tap_kwargs: update_tap_kwargs(self, popups_to_close=(self.parent.parent.parent.parent, ))
+    text: "   " + _(self.what)
+    icon_name: id_of_flow('delete', 'item')
+    image_size: self.height / 2.1, self.height / 2.1
+    width: self.parent.width / 4.2
+    relief_square_inner_colors: relief_colors((1, 1, 0))
+    relief_square_inner_lines: int(sp(6))
+    relief_square_inner_offset: int(sp(-3))
+    relief_square_outer_colors: relief_colors((1, 0, 0))
+
+
+<QrScannerPopup@FlowDropDown>
+    ZBarCam:
+        code_types: ('QRCODE', )
+        on_symbols: print("ZBARCAM symbols", args); app.main_app.on_qr_code_read(args[1][0].data)
