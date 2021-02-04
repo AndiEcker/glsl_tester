@@ -10,9 +10,9 @@ signale zu unterdrücken.
 
 aktuelle lautstärke: {round(state_value * 100)}%
 
-In dieser demo app beeinflusst
-dieser Wert zugleich die
-Transparenz der Animation.""",
+Als 'lambda: main_app.sound_volume'
+Ausdruck zum dynamischen Ändern von
+shader Argumenten verwendbar.""",
 #----------------------------------
 #---- OVERWRITING ae.gui_help -----
 "help_app_state#vibration_volume": """\
@@ -24,45 +24,7 @@ unterdrücken.
 
 aktuelle vibration: {round(state_value * 100)}%
 
-In dieser demo app beeinflusst
-dieser Wert zugleich den
-Farbkontrast der Animation.""",
-#==================================
-#---- OVERWRITING ae.gui_help -----
-"flow_id_ink": "{'farbe der ' if app.landscape else ''}transfer service hintergrund-animation",
-"flow_path_ink": "{'farbe der ' if app.landscape else ''}sideloading hintergrund-animation",
-"selected_item_ink": "{'farbe der ' if app.landscape else ''} transfer service fortschrittsanzeige",
-"unselected_item_ink": "{'farbe der ' if app.landscape else ''} sideloading fortschrittsanzeige",
-#----------------------------------
-"all": "Alles",
-"cancel transfer request": "Dateiübertragung abbrechen",
-"confirm request task type to clear": "Wähle Typ der zu löschenden Log-Einträge",
-"file": "Dateiübertragung",
-"Folders can't be transferred": "Verzeichnisse können nicht übertragen werden",
-"local ip": "Lokale ip",
-"log": "Log",
-"message": "Nachricht",
-"prepare resend": "Zur Weiterleitung vorbereiten",
-"recover send request": "Dateiübertragung fortsetzen",
-"request task data": "Log-Eintrags-Daten",
-"Select Single File": "Wähle einzelne Datei aus",
-"sideloading": "Sideloading",
-#----------------------------------
-#---- move to kivy_qr_displayer ---
-"\\nEither manually type/copy the window title string or use a QR code reader.":
-    "\\nBenutze entweder eine QR-Lese-App oder schreibe diese manuell in die Adressleiste des Browsers.",
-"\\n\\nTap outside of this window for to close it.":
-    "\\n\\nTippe außerhalb dieses Windows um es zu schließen.",
-"The {root.qr_content} shown in the window title is underneath encoded as QR code.":
-    "Die oben angezeigte {root.qr_content} ist unterhalb als QR kodiert.",
-#----------------------------------
-#---- move to kivy_sideloading ----
-"display sideloading address/QR code": "Sideloading-Adresse/QR-code anzeigen",
-"folders can't be send via sideloading": "Verzeichnisse sind nicht via sideloading übertragbar",
-"select file for sideloading": "Sideloading-Datei auswählen",
-"select single file": "Wähle einzelne Datei aus",
-"sideloading file info": "Sideloading-Datei-Info",
-"sideloading url": "Sideloading-Adresse",
-"start sideloading server": "Sideloading-Server starten",
-"stop sideloading server": "Sideloading-Server anhalten",
+Als 'lambda: main_app.vibration_volume'
+Ausdruck zum dynamischen Ändern von
+shader Argumenten verwendbar.""",
 }

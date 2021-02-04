@@ -1,0 +1,8 @@
+lambda: main_app.sound_volume
+lambda: main_app.vibration_volume
+main_app.sound_volume
+main_app.vibration_volume
+1.0
+0.9
+0.6
+0.3

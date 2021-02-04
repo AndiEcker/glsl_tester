@@ -10,10 +10,9 @@ all shader animations.
 
 current value: [b]{round(state_value * 100)}%[/b]
 
-In this demo app this value
-also affects the opacity of
-the shader animations.
-""",
+Use 'lambda: main_app.sound_volume'
+expression for to dynamically change
+shader arguments.""",
 #----------------------------------
 #---- OVERWRITING ae.gui_help -----
 "help_app_state#vibration_volume": """\
@@ -24,13 +23,7 @@ to mute all vibrations.
 
 current vibration: {round(state_value * 100)}%
 
-In this demo app this value
-also affects the color contrast
-of the shader animations.""",
-#==================================
-#---- OVERWRITING ae.gui_help -----
-"flow_id_ink": "{'color of the ' if app.landscape else ''}transfer service background animation",
-"flow_path_ink": "{'color of the ' if app.landscape else ''}sideloading background animation",
-"selected_item_ink": "{'color of the ' if app.landscape else ''}transfer service progress animation",
-"unselected_item_ink": "{'color of the ' if app.landscape else ''}sideloading server progress animation",
+Use 'lambda: main_app.vibration_volume'
+expression for to dynamically change
+shader arguments.""",
 }

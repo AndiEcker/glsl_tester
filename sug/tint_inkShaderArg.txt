@@ -1,0 +1,11 @@
+lambda: main_app.unselected_item_ink
+lambda: main_app.selected_item_ink
+lambda: main_app.flow_path_ink
+lambda: (1.0 - main_app.last_touch.y / Window.height, 1.0 - main_app.last_touch.y / Window.height, 0.3 + main_app.last_touch.y * 0.69 / Window.height, 0.3 + main_app.last_touch.x * 0.69 / Window.width)
+lambda: (1.0 - touch.y / Window.height, 1.0 - touch.y / Window.height, 0.3 + touch.y * 0.69 / Window.height, 0.3 + touch.x * 0.69 / Window.width)
+lambda: main_app.flow_id_ink
+lambda: main_app.flow_path_ink
+lambda: main_app.selected_item_ink
+lambda: main_app.unselected_item_ink
+0.0, 0.0, 0.0, 1.0
+1.0, 1.0, 1.0, 1.0

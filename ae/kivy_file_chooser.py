@@ -69,6 +69,7 @@ __version__ = '0.1.0'
 
 
 Builder.load_string('''\
+#: import os os
 <FileChooserPopup>
     do_scroll_x: True
     do_scroll_y: False

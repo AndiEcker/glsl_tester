@@ -2,7 +2,7 @@
 
 GlslTester is a Python multi-platform application project based on the [__Kivy__ Framework](https://kivy.org) 
 and the [__ae__ (Application Environment)](https://ae.readthedocs.io "ae on rtd")
-namespace package.
+namespace package for to code and test shaders written in GLSL.
 
 additional credits to:
 

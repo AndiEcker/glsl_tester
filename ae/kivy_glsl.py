@@ -42,7 +42,8 @@ The refreshing frequency can be specified via the :paramref:`~ShadersMixin.add_r
 For to disable the automatic creation of a timer event pass a zero value to this argument.
 
 .. hint::
-    The demo app :ref:`GlslTester <https://gitlab.com/ae-group/comparty>` is disabling the automatic timer event
+    The demo apps :ref:`ComPartY <https://gitlab.com/ae-group/comparty>` and
+    :ref:`GlslTester <https://github.com/AndiEcker/glsl_tester>` are disabling the automatic timer event
     for each shader and using instead one app internal timer event for to update all active shaders.
 
 
@@ -66,7 +67,7 @@ The animated :data:`plasma hearts shader <plasma_hearts_shader_code>` is inspire
 https://github.com/kivy/kivy/blob/master/examples/shader/plasma.py.
 
 .. hint::
-    The app :ref:`GlslTester <https://gitlab.com/ae-group/comparty>` is demonstrating the usage of this portion
+    The :ref:`ComPartY <https://gitlab.com/ae-group/comparty>` app is demonstrating the usage of this portion
     by implementing into its root widget all the built-in shaders of this portion.
 
 The literals of the shader code got converted into constants following the
@@ -79,7 +80,6 @@ from kivy.clock import Clock
 from kivy.factory import Factory
 from kivy.graphics.instructions import Canvas, RenderContext
 from kivy.graphics.vertex_instructions import Rectangle
-from kivy.properties import NumericProperty
 
 from ae.base import os_platform
 
@@ -123,7 +123,7 @@ uniform vec2 resolution;
 uniform vec4 tint_ink;
 
 const float TEN = 9.99999;
-const float TWO = 1.99999;
+const float TWO = 2.00001;
 const float ONE = 0.99999;
 
 void main(void)
@@ -189,19 +189,23 @@ class ShadersMixin:
     pos: list
     size: list
 
-    # properties and attributes
-    alpha: float = NumericProperty()        #: color alpha/opacity of the shader output
-    contrast: float = NumericProperty()     #: color contrast GLSL input variable
+    # attributes
     renderers: List[RendererType] = list()  #: list/pool of active shaders/render-contexts
 
-    def add_renderer(self, add_to: Optional[Canvas] = None, shader_code: str = plasma_hearts_shader_code,
+    def add_renderer(self, add_to: Optional[Canvas] = None,
+                     shader_code: str = plasma_hearts_shader_code, shader_file: str = "",
                      start_time: Optional[float] = 0.0, update_freq: float = 30.0,
                      **glsl_dyn_args) -> int:
         """ create new render context canvas and add it.
 
-        :param add_to:          canvas to add the new render context. If not passed then use the before canvas of the
-                                widget instance mixed-into.
-        :param shader_code:     shader code block.
+        :param add_to:          canvas or existing render context to add the new render context to. If not passed then
+                                the before canvas of the widget instance mixed-into will be used if exists. If the
+                                before canvas does not exist then the new render context will be set as a normal canvas.
+                                By passing an already existing render context (e.g. self.renderers[-1]['render_ctx'])
+                                then the new render context will be added to the passed one - in this case the new
+                                render context will also get invisible if you delete the passed render context.
+        :param shader_code:     fragment shader code block (will be ignored if :paramref:`.shader_file` is not empty).
+        :param shader_file:     filename with the glsl shader code (with “–VERTEX” or “–FRAGMENT” sections) to load.
         :param start_time:      base/start time. Passing the default value zero is syncing the `time` glsl parameter
                                 of this renderer with :meth:`kivy.clock.Clock.get_boottime()`.
                                 Pass None for to initialize this argument to the current Clock boot time; this
@@ -215,8 +219,8 @@ class ShadersMixin:
                                 * `'alpha'`: opacity (0.0 - 1.0).
                                 * `'center_pos'`: center position in Window coordinates.
                                 * `'contrast'`: color contrast (0.0 - 1.0).
-                                * `'resolution'`: size tuple of width and height floats in Window coordinates.
-                                * `'tex_col_mix'`: float factor (0.0 - 1.0) for to mix the kivy input texture
+                                * `'resolution'`: size tuple of width and height in Window coordinates.
+                                * `'tex_col_mix'`: factor (0.0 - 1.0) for to mix the kivy input texture
                                    and the calculated color. A value of 1.0 will only show the shader color,
                                    whereas 0.0 will result in the color of the input texture (uniform texture0).
                                 * `'tint_ink'`: tint color with color parts in the range 0.0 till 1.0.
@@ -227,6 +231,9 @@ class ShadersMixin:
                                 For to provide a dynamic/current value, the value of this dict has to be a callable,
                                 which will be called without arguments and the return value will be passed into
                                 the glsl shader.
+
+                                .. note::
+                                    Passing a `int` value to a `float` variable or vector gets interpreted as `0.0`.
 
         :return:                index of the created/added render context.
         """
@@ -245,21 +252,25 @@ class ShadersMixin:
             rectangle = Rectangle(pos=self.pos, size=self.size)
 
         shader = ren_ctx.shader
-        old_value = shader.fs
-        shader.fs = shader_code
+        if shader_file:
+            old_value = shader.source
+            shader.source = shader_file
+        else:
+            old_value = shader.fs
+            shader.fs = shader_code
         if not shader.success:
-            shader.fs = old_value
-            raise ValueError("ShadersMixin.add_renderer(): failed to compile fragment shader code")
+            if shader_file:
+                shader.source = old_value
+            else:
+                shader.fs = old_value
+            raise ValueError("ShadersMixin.add_renderer(): failed to compile shader code (see console output)")
 
         renderer_idx = len(self.renderers)
         if renderer_idx == 0:
             self.renderers = list()     # create attribute on this instance (leave class attribute untouched emtpy list)
 
-        if add_to is None:
-            if renderer_idx:
-                add_to = self.renderers[-1]['render_ctx']
-            elif self.canvas is not None:
-                add_to = self.canvas.before
+        if add_to is None and self.canvas is not None:
+            add_to = self.canvas.before
         if add_to is None:
             self.canvas = ren_ctx
         else:
@@ -308,19 +319,6 @@ class ShadersMixin:
                 if 'time' in dyn_args and not callable(dyn_args['time']):
                     dyn_args['time'] += increment
 
-    def on_alpha(self, _instance: Any, value: float):
-        """ alpha/opacity changed """
-        for ren in self.renderers:
-            if not ren['deleted']:
-                # has no effect: ren['render_ctx'].opacity = value
-                ren['glsl_dyn_args']['alpha'] = value
-
-    def on_contrast(self, _instance: Any, value: float):
-        """ contrast changed """
-        for ren in self.renderers:
-            if not ren['deleted']:
-                ren['glsl_dyn_args']['contrast'] = value
-
     def on_pos(self, _instance: Any, value: Iterable):
         """ pos """
         for ren in self.renderers:
@@ -343,12 +341,16 @@ class ShadersMixin:
         :param renderer:        dict with render context, rectangle and glsl input arguments.
         """
         ren_ctx = renderer['render_ctx']
+        start_time = renderer['start_time']
+        if callable(start_time):
+            start_time = start_time()
 
         # first set defaults then overwrite with user parameters
-        ren_ctx['alpha'] = self.alpha
+        ren_ctx['alpha'] = renderer.get('alpha', 0.69)
+        ren_ctx['contrast'] = renderer.get('contrast', 0.69)
         ren_ctx['resolution'] = list(map(float, self.size))
         ren_ctx['tex_col_mix'] = renderer.get('tex_col_mix', 0.69)
-        ren_ctx['time'] = Clock.get_boottime() - renderer['start_time']
+        ren_ctx['time'] = Clock.get_boottime() - start_time
 
         # then overwrite glsl arguments with dynamic user values
         for key, val in renderer['glsl_dyn_args'].items():
