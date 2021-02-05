@@ -1,3 +1,6 @@
 kivy
+ae_kivy_glsl
+ae_kivy_dyn_chi         # hidden python dependency via main.kv
 ae_kivy_app
+ae_kivy_file_chooser    # hidden python dependency via main.kv
 ae_kivy_user_prefs      # hidden python dependency via main.kv

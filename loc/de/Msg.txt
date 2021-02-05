@@ -27,4 +27,12 @@ aktuelle vibration: {round(state_value * 100)}%
 Als 'lambda: main_app.vibration_volume'
 Ausdruck zum dynamischen Ändern von
 shader Argumenten verwendbar.""",
+#==================================
+"add shader error": "Fehler beim Start des Shaders",
+"animation exception - stopped": "Animationsfehler - angehalten",
+"{file_path} is not a shader file": "{file_path} ist keine shader-datei",
+"invalid expression in shader argument {arg_name}": "Der Ausdruck {arg_name} ist fehlerhaft",
+"missing 'shader_arg_{arg_name}' app state": "'shader_arg_{arg_name}' app state existiert nicht",
+"shader compilation/start failed: {ex}": "Shader-Start-Fehler: {ex}",
+"shader file {shader_filename} not found": "shader-datei {shader_filename} existiert nicht",
 }

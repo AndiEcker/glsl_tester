@@ -5,7 +5,7 @@ GlslTester - play with glsl shaders
 Write, compile and run glsl shader code on any platform supported by Kivy.
 """
 import os
-from typing import Callable
+from typing import Callable, Tuple, cast
 
 from ae.base import UNSET
 from kivy.clock import Clock
@@ -53,6 +53,7 @@ class ShaderArgInput(BoxLayout):
 
 class GlslTesterApp(KivyMainApp):
     """ main app class. """
+    mouse_pos: Tuple[float, float]          #: current mouse pointer position in the render widget
     last_touch: MotionEvent                 #: last touch event: init=DefaultTouch(), update=RenderWidget.on_touch_down
     on_render_shader_frequency: Callable    #: event handler patched to self._render_shader_restart
     render_shader_frequency: float          #: pending requests timer frequency
@@ -60,20 +61,22 @@ class GlslTesterApp(KivyMainApp):
     shader_filename: str                    #: current shader filename app state
 
     def on_app_run(self):
-        """ run app and create timer for to gather pending requests from transfer service. """
+        """ run app and create timer for to animate/progress shader renderer. """
         super().on_app_run()
-
-        # redirect handler for change of render_shader_frequency app state from user preferences menu
-        self.on_render_shader_frequency = self._render_shader_restart
-
-        self._render_shader_restart()
 
     def on_app_started(self):
         """ initialize render_widget after kivy app and window got initialized. """
         super().on_app_started()
 
+        # redirect handler for change of render_shader_frequency app state from user preferences menu
+        self.on_render_shader_frequency = self._render_shader_restart
+
+        Window.bind(mouse_pos=self.on_mouse_pos)
+        self.mouse_pos = (0.0, 0.0)
         self.last_touch = DefaultTouch("default_touch", 1, {"x": .5, "y": .5})
         self.render_widget = self.framework_root.ids.render_widget
+
+        self._render_shader_restart()
 
     def on_file_chooser_submit(self, file_path: str, chooser_popup: Widget):
         """ event callback from FileChooserPopup.on_submit() on selection of file.
@@ -82,11 +85,18 @@ class GlslTesterApp(KivyMainApp):
         :param chooser_popup:   file chooser popup/container widget.
         """
         if not os.path.isfile(file_path):
-            self.show_message(get_txt("Folders can't be selected"), title=get_txt("Select Single File"))
+            self.show_message(get_txt("{file_path} is not a shader file"), title=get_txt("select single file"))
             return
 
         self.change_app_state('shader_filename', file_path)  # allows also a folder to be transferred
         chooser_popup.dismiss()
+
+    def on_mouse_pos(self, _instance, pos):
+        """ Window mouse position event handler. """
+        self.vpo(f"GlslTesterApp.on_mouse_pos({_instance}, {pos})")
+        render_widget: Widget = cast(Widget, self.render_widget)
+        if render_widget.collide_point(*render_widget.to_widget(*pos)):
+            self.mouse_pos: Tuple[float, ...] = tuple(map(float, pos))
 
     def on_tool_box_toggle(self, _flow_key: str, _event_kwargs: EventKwargsType) -> bool:
         """ toggle between display and hide of tool box.
@@ -107,27 +117,30 @@ class GlslTesterApp(KivyMainApp):
         :param _event_kwargs:   unused event kwargs.
         :return:                True for to confirm change of flow id else False.
         """
-        title = "Render Shader Start Error"
+        title = get_txt("add shader error")
         shader_filename = self.shader_filename
         if not os.path.exists(shader_filename):
-            self.show_message(f"shader file {shader_filename} not found.", title=title)
+            self.show_message(get_txt("shader file {shader_filename} not found"), title=title)
             return False
 
         kwargs = dict(time=0.0, update_freq=0.0)
-        shader_code = read_file_text(shader_filename)
-        if "---vertex" in shader_code.lower() or "---fragment" in shader_code.lower():
-            kwargs['shader_file'] = shader_filename
-        else:
-            kwargs['shader_code'] = shader_code
 
-        glo_vars = globals().copy()
-        glo_vars.update(app=self.framework_app, Clock=Clock, main_app=self, root=self.framework_root,
-                        touch=self.last_touch, Window=Window, _add_base_globals=True)
+        shader_code = read_file_text(shader_filename)
+        if ".fs" in shader_filename:
+            kwargs['shader_code'] = shader_code
+        else:
+            kwargs['shader_file'] = shader_filename
+            if self.debug:
+                lower_code = shader_code.lower()
+                assert "---vertex" in lower_code or "---fragment" in lower_code, "missing vertex/fragment sections"
+
+        glo_vars = globals().copy()     # contains main_app variable from module level
+        glo_vars.update(Clock=Clock, mouse=self.mouse_pos, touch=self.last_touch, Window=Window, _add_base_globals=True)
         shader_args = self.get_var('render_shader_args')
         for arg_name in shader_args:
             arg_inp = getattr(self, 'shader_arg_' + arg_name, UNSET)
             if arg_inp is UNSET:
-                self.show_message(f"shader argument not declared as 'shader_arg_{arg_name}' app state", title=title)
+                self.show_message(get_txt("missing 'shader_arg_{arg_name}' app state"), title=title)
                 return False
             if not arg_inp:
                 self.vpo(f"   #  skipping empty shader argument {arg_name}")
@@ -135,15 +148,16 @@ class GlslTesterApp(KivyMainApp):
 
             arg_val = try_eval(arg_inp, ignored_exceptions=(Exception, ), glo_vars=glo_vars)
             if arg_val is UNSET:
-                self.show_message(f"invalid expression in shader argument {arg_name}", title=title)
+                self.show_message(get_txt("invalid expression in shader argument {arg_name}"), title=title)
                 return False
 
             kwargs[arg_name] = arg_val
 
+        # noinspection PyUnusedLocal
         try:
             self.render_widget.add_renderer(**kwargs)
-        except ValueError as ex:
-            self.show_message(f"shader compilation/start failed: {ex}", title=title)
+        except (ValueError, Exception) as ex:
+            self.show_message(get_txt("shader compilation/start failed: {ex}"), title=title)
             return False
 
         self._update_registered_renderers()
@@ -172,7 +186,12 @@ class GlslTesterApp(KivyMainApp):
         """ timer for the animation of the running shaders. """
         render_widget = self.render_widget
         render_widget.next_tick()
-        render_widget.refresh_renderers()
+        try:
+            render_widget.refresh_renderers()
+        except (NameError, ValueError, Exception) as ex:
+            self.render_shader_frequency = 0.0
+            self._render_shader_restart()
+            self.show_message(str(ex), get_txt("animation exception - stopped"))
 
     def _update_registered_renderers(self):
         """ update the running shaders buttons after add/delete of a running shader. """
@@ -189,9 +208,9 @@ if __name__ == '__main__':
     main_app = GlslTesterApp(app_name='glsltester', multi_threading=True)
 
     PATH_PLACEHOLDERS['glsl'] = script_path = os.path.join(norm_path("{ado}"), "glsl")
-    os.makedirs(script_path, exist_ok=True)
+    check_moves("glsl", script_path)
     for name, code in BUILT_IN_SHADERS.items():
-        write_file_text(code, os.path.join(script_path, f"{name}.glsl"))
+        write_file_text(code, os.path.join(script_path, f"{name}.fs.txt"))
 
     PATH_PLACEHOLDERS['sug'] = sug_path = os.path.join(norm_path("{ado}"), "sug")
     check_moves("sug", sug_path)

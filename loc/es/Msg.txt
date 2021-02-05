@@ -26,4 +26,12 @@ vibración actual: {round(state_value * 100)}%
 Usar la expression
 'lambda: main_app.vibration_volume'
 para cambiar valores del shader.""",
+#==================================
+"add shader error": "error en añadir un shader",
+"animation exception - stopped": "error de animación - suspendida",
+"{file_path} is not a shader file": "{file_path} no es un fichero de código de shader",
+"invalid expression in shader argument {arg_name}": "la expresión de {arg_name} no es válida",
+"missing 'shader_arg_{arg_name}' app state": "el 'shader_arg_{arg_name}' app state no existe",
+"shader compilation/start failed: {ex}": "error '{ex}' en arrancar el shader",
+"shader file {shader_filename} not found": "el fichero de shader {shader_filename} no existe",
 }

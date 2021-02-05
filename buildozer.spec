@@ -43,9 +43,9 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 requirements = android, hostpython3==3.7.5, python3==3.7.5, kivy==2.0.0, plyer,
-    ae.base, ae.paths, ae.files, ae.deep, ae.inspector, ae.i18n, ae.updater, ae.core, ae.literal, ae.console,
+    ae.base, ae.paths, ae.files, ae.deep, ae.droid, ae.inspector, ae.i18n, ae.updater, ae.core, ae.literal, ae.console,
     ae.parse_date, ae.gui_app, ae.gui_help, ae.kivy_auto_width, ae.kivy_dyn_chi, ae.kivy_help, ae.kivy_relief_canvas,
-    ae.kivy_app, ae.kivy_user_prefs
+    ae.kivy_app, ae.kivy_user_prefs, ae.kivy_glsl, ae.kivy_file_chooser
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
