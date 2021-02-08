@@ -1,26 +1,17 @@
 // Original shader from: https://www.shadertoy.com/view/wl3fR7
-
-#ifdef GL_ES
-precision mediump float;
-#endif
+// License CC0: Slicing a 4D apollian
+// Was experimenting with slicing 3D fractals in 2D. Naturally I wondered how it looks if we +1 dimension
+// Based upon: https://www.shadertoy.com/view/4ds3zn
+$HEADER$
 
 uniform float alpha;
 uniform float time;
 uniform vec2 resolution;
 
-// shadertoy emulation
-#define iTime time
-#define iResolution resolution
-
-// --------[ Original ShaderToy begins here ]---------- //
-// License CC0: Slicing a 4D apollian
-// Was experimenting with slicing 3D fractals in 2D.
-// Naturally I wondered how it looks if we +1 dimension
-// Based upon: https://www.shadertoy.com/view/4ds3zn
 #define PI  3.141592654
 
-const int   max_iter      = 130;
-const vec3  bone          = vec3(0.89, 0.855, 0.788);
+const int max_iter = 130;
+const vec3 bone = vec3(0.89, 0.855, 0.788);
 
 void rot(inout vec2 p, float a) {
   float c = cos(a);
@@ -37,21 +28,18 @@ float apollian(vec4 p, float s) {
   float scale = 1.0;
 
   for(int i=0; i<7; ++i) {
-    p        = -1.0 + 2.0*fract(0.5*p+0.5);
-
+    p = -1.0 + 2.0*fract(0.5*p+0.5);
     float r2 = dot(p,p);
-    
-    float k  = s/r2;
-    p       *= k;
-    scale   *= k;
+    float k = s/r2;
+    p *= k;
+    scale *= k;
   }
-  
   return 0.45*abs(p.y)/scale;
 }
 
 float df(vec3 p) { 
   vec4 p4 = vec4(p, 0.125);
-  float tm = 0.1*iTime;
+  float tm = 0.1*time;
   rot(p4.xw, tm*sqrt(0.5));
   rot(p4.yw, tm*sqrt(0.4));
   rot(p4.zw, tm*sqrt(0.3));
@@ -59,8 +47,7 @@ float df(vec3 p) {
   float db = box(p - vec3(0.0, 0.5, 0.0), vec3(0.75,1.0, 0.75)) - 0.5;
   float dp = p.y;
   return max(d1, db); 
-} 
-
+}
 
 float intersect(vec3 ro, vec3 rd, out int iter) {
   float res;
@@ -84,7 +71,6 @@ float intersect(vec3 ro, vec3 rd, out int iter) {
 float ambientOcclusion(vec3 p, vec3 n) {
   float stepSize = 0.012;
   float t = stepSize;
-
   float oc = 0.0;
 
   for(int i = 0; i < 12; i++) {
@@ -92,7 +78,6 @@ float ambientOcclusion(vec3 p, vec3 n) {
     oc += t - d;
     t += stepSize;
   }
-
   return clamp(oc, 0.0, 1.0);
 }
 
@@ -118,20 +103,21 @@ vec3 lighting(vec3 p, vec3 rd, int iter) {
 vec3 post(vec3 col, vec2 q) {
   col=pow(clamp(col,0.0,1.0),vec3(0.65)); 
   col=col*0.6+0.4*col*col*(3.0-2.0*col);  // contrast
-  col=mix(col, vec3(dot(col, vec3(0.33))), -0.5);  // satuation
-  col*=0.5+0.5*pow(19.0*q.x*q.y*(1.0-q.x)*(1.0-q.y),0.7);  // vigneting
+  col=mix(col, vec3(dot(col, vec3(0.33))), -0.5);  // saturation
+  col*=0.5+0.5*pow(19.0*q.x*q.y*(1.0-q.x)*(1.0-q.y),0.7);  // vignetting
   return col;
 }
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord )  { 
-  vec2 q=fragCoord.xy/iResolution.xy;
-  vec2 uv = -1.0 + 2.0*q; 
+void main(void) {
+  vec2 q=gl_FragCoord.xy / resolution.xy;
+  vec4 tex = texture2D(texture0, tex_coord0);
+  vec2 uv = -1.0 + 2.0*q;
   uv.y += 0.225;
-  uv.x*=iResolution.x/iResolution.y; 
+  uv.x*=resolution.x/resolution.y;
     
   vec3 la = vec3(0.0, 0.0, 0.0); 
   vec3 ro = vec3(-4.0, 1., -0.0);
-  rot(ro.xz, 2.0*PI*iTime/120.0);
+  rot(ro.xz, 2.0*PI*time/120.0);
   vec3 cf = normalize(la-ro); 
   vec3 cs = normalize(cross(cf,vec3(0.0,1.0,0.0))); 
   vec3 cu = normalize(cross(cs,cf)); 
@@ -149,16 +135,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )  {
   if(t > -0.5) {
     p = ro + t * rd;
     col = lighting(p, rd, iter); 
-    col = mix(col, bg, 1.0-exp(-0.001*t*t)); 
-  } 
-    
+    col = mix(col, bg, 1.0-exp(-0.001*t*t));
+  }
 
   col=post(col, q);
-  fragColor=vec4(col.x,col.y,col.z,alpha); 
-}
-// --------[ Original ShaderToy ends here ]---------- //
-
-void main(void)
-{
-    mainImage(gl_FragColor, gl_FragCoord.xy);
+  gl_FragColor=vec4(col.x,col.y,col.z,alpha);
 }

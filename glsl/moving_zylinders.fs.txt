@@ -1,36 +1,30 @@
-#extension GL_OES_standard_derivatives : enable
-
-#ifdef GL_ES
-precision mediump float;
-#endif
+$HEADER$
 
 uniform float alpha;
 uniform float time;
 uniform vec2 resolution;
 
 void main( void ) {
-	vec2 res = resolution.xy;
-	vec2 p = 2.*(gl_FragCoord.xy-res/2.) / res.y;
-	float r;
-	vec3 col = vec3(0.);
-    
-	
-	const float I = 15.;
-	for(float i=1.; i<=I; i++) {
-		if(length(p)<1.) {
-			r = cos(time*.2+.3*i)/2.;
-			if(p.x<2.*r) {
-				p.x -= r-.5;
-				p /= r+.5;
-			} else {
-				p.x -= r+.5;
-				p /= r-.5;
-			}
-			col.r = i/(I*p.x);
-			col.b = p.x-r;
-			col.b *= 0.5;
-		}
-    	}
-    
-	gl_FragColor = vec4(col, alpha);
+ vec2 res = resolution.xy;
+ vec2 p = 2.*(gl_FragCoord.xy-res/2.) / res.y;
+ float r;
+ vec3 col = vec3(0.);
+ const float I = 15.;
+ for(float i=1.; i<=I; i++) {
+  if(length(p)<1.) {
+   r = cos(time*.2+.3*i)/2.;
+   if(p.x<2.*r) {
+    p.x -= r-.5;
+    p /= r+.5;
+   } else {
+    p.x -= r+.5;
+    p /= r-.5;
+   }
+   col.r = i/(I*p.x);
+   col.b = p.x-r;
+   col.b *= 0.5;
+  }
+ }
+ gl_FragColor = vec4(col, alpha);
+ vec4 tex = texture2D(texture0, tex_coord0);
 }

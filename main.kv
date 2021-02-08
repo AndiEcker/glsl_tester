@@ -1,11 +1,12 @@
 #: import _d_ ae.kivy_dyn_chi
 #: import _f_ ae.kivy_file_chooser
 #: import _u_ ae.kivy_user_prefs
+#: import read_file_text ae.files.read_file_text
 <Main@BoxLayout>
     orientation: 'vertical'
     BoxLayout:
         size_hint_y: None
-        height: app.app_states['font_size'] * 1.5
+        height: app.app_states['font_size'] * 1.8 * (1 + 2 * app.main_app.debug_level)
         spacing: '3sp'
         HelpToggler:
         UserPreferencesButton:
@@ -66,6 +67,7 @@
                 auto_complete_texts: file_lines(norm_path("{ado}/ShaderFilenameSuggestions.txt"))
                 on_auto_complete_texts:
                     write_file_text(self.auto_complete_texts, norm_path("{ado}/ShaderFilenameSuggestions.txt"))
+                on_text: app.main_app.update_shader_file()
             OptionalButton:
                 tap_flow_id: id_of_flow('open', 'file_chooser')
                 tap_kwargs:
@@ -97,23 +99,30 @@
     on_touch_down: if self.collide_point(*args[1].pos): app.main_app.last_touch = args[1]
 
 
+<ShaderButton@ShadersMixin+FlowButton>:
+    debug_shader_idx: -1
+    tap_flow_id: id_of_flow('del', 'renderer', self.text)
+    size_hint_y: None
+    height: self.parent.height if self.parent else self.height
+    relief_ellipse_inner_colors: relief_colors()
+    relief_ellipse_inner_lines: int(self.height / 3.9)
+    on_parent: app.main_app.update_debug_shader(self)
+
 <RunningShaders@DynamicChildrenBehavior+GridLayout>
     rows: 1
     registered_renderers: []
     child_data_maps:
-        [dict(kwargs=dict(text=str(dic['renderer_idx']), \
-        tap_flow_id=id_of_flow('del', 'renderer', str(dic['renderer_idx'])), \
-        relief_ellipse_inner_colors=relief_colors(), \
-        relief_ellipse_inner_lines=int(self.height / 3.9))) \
-        for dic in self.registered_renderers]
+        [dict(cls='ShaderButton', kwargs=dict(text=str(dic['renderer_idx']))) for dic in self.registered_renderers]
+    canvas:
 
 
 <ShaderArgInput>
     size_hint_y: None
     height: app.main_app.font_size * 1.8 if root.parent and root.parent.parent.visible else 0.0
-    visible: root.parent and root.parent.parent.visible
+    visible: bool(root.parent and root.parent.parent.visible)
     ImageLabel:
-        text: root.arg_name + ":" if root.visible else ""   # strange: visible in dark mode (even with color.alpha==0)
+        # strange: text is visible in dark mode (even with color.alpha==0), therefore had to set it to empty string
+        text: _(app.main_app.shader_arg_alias(root.arg_name)) + ":" if root.visible else ""
         text_size: self.width, None
         halign: 'right'
         size_hint_x: 0.39
@@ -131,7 +140,8 @@
     padding: '6sp'
     cols: max(1, int(Window.width / (21 * app.main_app.font_size)))
     child_data_maps:
-        [dict(cls='ShaderArgInput', kwargs=dict(arg_name=arg)) for arg in app.main_app.get_var('render_shader_args')]
+        [dict(cls='ShaderArgInput', kwargs=dict(arg_name=arg)) for arg in app.main_app.get_var('render_shader_args') \
+        if arg == 'start_time' or " " + arg + ";" in app.app_states['next_shader']]
 
 
 <UserPreferencesPopup>:

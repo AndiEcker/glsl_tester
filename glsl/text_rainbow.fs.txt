@@ -1,21 +1,11 @@
 // Original shader from: https://www.shadertoy.com/view/3lKyzW
-
-#ifdef GL_ES
-precision mediump float;
-#endif
+// Fork of "cosmos font smooth" by netgrind. https://shadertoy.com/view/Xdjfzw 2021-01-14 00:00:36
+$HEADER$
 
 uniform float alpha;
 uniform float time;
+uniform float contrast;
 uniform vec2 resolution;
-
-// shadertoy emulation
-#define iTime time
-#define iResolution resolution
-const vec4 iMouse = vec4(0.);
-
-// --------[ Original ShaderToy begins here ]---------- //
-// Fork of "cosmos font smooth" by netgrind. https://shadertoy.com/view/Xdjfzw
-// 2021-01-14 00:00:36
 
 #define line1 _ y_ o_ u_ _ a_ r_ e_ _ a_ crlf
 #define line2 _ _ r_ a_ i_ n_ b_ o_ w_
@@ -280,9 +270,7 @@ vec2 fieldNormal(vec2 uv)
    ));
 }
 
-
-// Repeat around the origin by a fixed angle.
-// For easier use, num of repetitions is use to specify the angle.
+// Repeat around the origin by a fixed angle. For easier use, num of repetitions is use to specify the angle.
 float pModPolar(inout vec2 p, float repetitions, float phase) {
 	float angle = 2.*3.14159/repetitions;
 	float a = atan(p.y, p.x) + angle/2.+phase/repetitions;
@@ -298,54 +286,40 @@ float pModPolar(inout vec2 p, float repetitions, float phase) {
 }
 
 vec3 art(vec2 uv){
-    float aa = atan(uv.x, uv.y);
-
-    pModPolar(uv, 6., iTime);
-    uv.x = abs(mod(uv.x-iTime, 10.)-5.);
-    uv.y = abs(mod(uv.y+15., 30.)-15.);
-    
-    float a = atan(uv.x, uv.y);
-float d= length(uv)*.2;
-uv.x*=1.+sin(uv.x+a-d+iTime)*.1;
-uv.y*=1.+cos(uv.y+a+d+iTime)*.1;
-    float grid = smoothstep(.03, .5, abs(mod(a/3.1415*7., 2.)-1.));
-    grid += smoothstep(0., 1.,pow(mod(d, 1.), 3.));
-    vec3 c =vec3(mix(d, grid, smoothstep(.1, 1., d)));
-    c.rgb +=aa/3.1415;
-    return c;
+ float aa = atan(uv.x, uv.y);
+ pModPolar(uv, 6., time);
+ uv.x = abs(mod(uv.x-time, 10.)-5.);
+ uv.y = abs(mod(uv.y+15., 30.)-15.);
+ float a = atan(uv.x, uv.y);
+ float d= length(uv)*.2;
+ uv.x*=1.+sin(uv.x+a-d+time)*.1;
+ uv.y*=1.+cos(uv.y+a+d+time)*.1;
+ float grid = smoothstep(.03, .5, abs(mod(a/3.1415*7., 2.)-1.));
+ grid += smoothstep(0., 1.,pow(mod(d, 1.), 3.));
+ vec3 c =vec3(mix(d, grid, smoothstep(.1, 1., d)));
+ c.rgb +=aa/3.1415;
+ return c;
 }
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
-{
-    spacing.y = spacing.x*.5;
-    spacing.z = 1./spacing.x;
-    
-    float scale = 1.0;
-	vec2 uv = ((fragCoord-0.5*iResolution.xy)/iResolution.xx)*40.;
-    
-    vec2 p = uv;
-    
-    uv.x*=1.+sin(uv.y*.2-iTime)*.05;
-    uv.y*=1.+cos(uv.x*.5+iTime)*.1;
-    uv.y+=cos(uv.x*.1-iTime);
-    
-    uv.x += 5.*spacing.x;
-    uv.y -= spacing.w*.5;
-    
-    float x = field(uv);
-    vec2 norm = fieldNormal(uv);
-    
-    float amp = pow(smoothstep(5., .5, x), .7);
-    vec3 c = art(p*(1. + iMouse.x/iResolution.x*10.)-norm*amp);
-    c = sin((vec3(0., .33, .66)+c+smoothstep(.5, .0, x)+smoothstep(.1, 2., x))*6.28+iTime)*.5+.5;
-   // c = mix(c, vec3(0.), smoothstep(.5, .4, x));
-   float v = smoothstep(.2, .3, x);
-	c = mix( sin(vec3(0., .33, .66)*7.+p.x+p.y+iTime)*.3+.9, c*smoothstep(15., 5., x), v);
-    fragColor = vec4(c, alpha);  // vec4(clamp(clr,0.0,1.0),alpha);
-}
-// --------[ Original ShaderToy ends here ]---------- //
-
-void main(void)
-{
-    mainImage(gl_FragColor, gl_FragCoord.xy);
+void main(void) {
+ spacing.y = spacing.x*.5;
+ spacing.z = 1./spacing.x;
+ float scale = 1.0;
+ vec2 uv = ((gl_FragCoord.xy-0.5*resolution.xy)/resolution.xx)*40.;
+ vec2 p = uv;
+ uv.x*=1.+sin(uv.y*.2-time)*.05;
+ uv.y*=1.+cos(uv.x*.5+time)*.1;
+ uv.y+=cos(uv.x*.1-time);
+ uv.x += 5.*spacing.x;
+ uv.y -= spacing.w*.5;
+ float x = field(uv);
+ vec2 norm = fieldNormal(uv);
+ float amp = pow(smoothstep(5., .5, x), .7);
+ vec3 c = art(p*(1. + contrast*10.)-norm*amp);
+ c = sin((vec3(0., .33, .66)+c+smoothstep(.5, .0, x)+smoothstep(.1, 2., x))*6.28+time)*.5+.5;
+ // c = mix(c, vec3(0.), smoothstep(.5, .4, x));
+ float v = smoothstep(.2, .3, x);
+ c = mix( sin(vec3(0., .33, .66)*7.+p.x+p.y+time)*.3+.9, c*smoothstep(15., 5., x), v);
+ gl_FragColor = vec4(c, alpha);  // vec4(clamp(clr,0.0,1.0),alpha);
+ vec4 tex = texture2D(texture0, tex_coord0);
 }

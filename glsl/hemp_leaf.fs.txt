@@ -1,6 +1,4 @@
-#ifdef GL_ES
-precision mediump float;
-#endif
+$HEADER$
 
 uniform float alpha;
 uniform float time;
@@ -8,17 +6,16 @@ uniform vec2 resolution;
 
 #define PI 3.14159265359
 
-
 void main(void) {
   vec2 st = (gl_FragCoord.xy - resolution.xy * 0.5) / min(resolution.y, resolution.x) * 1.2;
-
+  vec4 tex = texture2D(texture0, tex_coord0);
   float u_time = time*0.25;
 
   // cartesian to polar coordinates
   float radius = length(st);
   float a = atan(st.y, st.x);
 
-  // Repeat side acoriding to angle
+  // Repeat side according to angle
   float sides = 9.;
   float ma = mod(a, PI * 2.0 / sides);
   ma = abs(ma - PI / sides);
@@ -34,4 +31,3 @@ void main(void) {
   color = min(color, smoothstep(0.55, 0.5,	radius));
   gl_FragColor = color;
 }
-
