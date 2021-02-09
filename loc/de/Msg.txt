@@ -27,7 +27,135 @@ aktuelle vibration: {round(state_value * 100)}%
 Als 'lambda: main_app.vibration_volume'
 Ausdruck zum dynamischen Ändern von
 shader Argumenten verwendbar.""",
+#----------------------------------
+#---- OVERWRITING ae.gui_help -----
+"help_app_state#render_shader_frequency": """\
+animations-frequenz des shader-zeitgebers.
+
+aktuelle frequenz: {round(state_value)}Hz
+
+schiebe den regler ganz nach links um den
+shader-zeitgeber zu deativieren und um die
+'tick'-schaltfläche anzuzeigen mit welcher
+die shader-animation manuel um eine
+zeit-einheit weiterbewegt werden kann.""",
 #==================================
+"help_flow#add_renderer": """\
+tippe um eine neue Instanz
+der angegebenen shader-datei
+zu erstellen.""",
+"help_flow#del_renderer": """\
+tippe um diesen laufenden
+shader zu entfernen.""",
+"help_flow#shader_arg_alpha": """\
+gebe einen numerischen wert zwischen
+'0.0' and '1.0' für das {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+shader argument ein.
+
+Dieser eingegebene wert beeinflusst
+die transparenz der shader-ausgabe.
+
+Um diesen wert beim start eines
+shaders zu setzen kann einer der
+schieberegler im zahnrad-menü
+verwendet werden.
+'main_app.sound_volume' repräsentiert
+z.B. den lautstärke-regler (und
+'main_app.vibration_volume' die
+vibrations-intensität).
+
+Mit der zeichenkette 'lambda: ' am
+anfang kann der wert auch im laufenden
+shader dynamisch geändert werden. Die
+eingabe 'lambda: main_app.sound_volume'
+macht z.B. den lautstärke-regler
+des zahnrad-menüs zu einem
+dynamischen regler dieses wertes.""",
+"help_flow#shader_arg_center_pos": """\
+gebe zwei komma-werte (z.B. '100.0, 200.0')
+oder einen lambda-ausdruck für das
+{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader argument ein.
+
+Die meisten shader nutzen dieses
+argument als zentrale bildschirm-
+position (x,y) der animation.
+
+Der ausdruck 'main_app.last_touch.pos',
+welcher die zuletzt angetippte bildschirm-
+position repräsentiert, kann dazu z.B.
+verwendet werden.
+""",
+"help_flow#shader_arg_contrast": """\
+gebe einen numerischen komma-wert
+oder einen lambda-ausdruck ein um
+das {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader argument
+zu setzen.""",
+"help_flow#shader_arg_mouse": """\
+diese eingabe repräsentiert - ähnlich
+wie 'center_pos' - eine bildschirm-
+position (x, y).
+
+gebe entweder zwei komma-werte oder
+einen lambda-ausdruck ein um das
+{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader argument
+zu setzen.""",
+"help_flow#shader_arg_start_time": """\
+gebe entweder 'None', einen
+komma-wert oder einen lambda-
+ausdruck für das shader
+argument {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} ein.
+
+Wird der komma-wert '0.0'
+eingegeben dann wird der
+shader-zeitgeber mit allen
+anderen laufenden shadern
+synchronisiert.
+
+Bei eingabe von 'None'
+startet der shader-
+zeitgeber bei null.""",
+"help_flow#shader_arg_tex_col_mix": """\
+gebe einen komma-wert oder
+einen lambda-ausdruck für
+das {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+shader argument ein.""",
+"help_flow#shader_arg_tint_ink": """\
+das {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader argument
+repräsentiert eine farbe bestehend aus
+vier komma-werten (rot, grün, blau
+und alpha) zwischen 0.0 and 1.0.
+
+Verwende eine der farben des zahnrad-
+menüs. Die mit 'Farbe 1' bezeichnete
+Farbe entspricht dabei dem ausdruck
+'main_app.flow_id_ink'.
+'Farbe 2' entspricht 'main_app.flow_path_ink',
+'Farbe 3' 'main_app.selected_item_ink' und
+'Farbe 4' 'main_app.unselected_item_ink'.
+
+Zur dynamischen Änderung im laufenden shader
+stelle dem eingegebenen ausdruck die
+zeichenfolge 'lambda: ' voraus.""",
+"help_flow#shader_filename": """\
+gib den pfad der shader-datei ein oder
+tippe auf die ...-schaltfläche rechts
+daneben um eine shader-datei auszuwählen.""",
+"help_flow#tick_render_shader": """\
+tippe um (bei deaktiviertem
+shader-zeitgeber) die shader-
+animation manuell auf den
+nächsten wert zu setzen.""",
+"help_flow#toggle_tool_box": """\
+tippe um das fenster zur
+eingabe der shader-argumente
+zu {'öffnen' if self.state == 'down' else 'schließen'}.""",
+#==================================
+#---- OVERWRITING ae.gui_help -----
+"flow_id_ink": "farbe 1{' (main_app.flow_id_ink)' if app.landscape else ''}",
+"flow_path_ink": "farbe 2{' (main_app.flow_path_ink)' if app.landscape else ''}",
+"selected_item_ink": "farbe 3{' (main_app.selected_item_ink)' if app.landscape else ''}",
+"unselected_item_ink": "farbe 4{' (main_app.unselected_item_ink)' if app.landscape else ''}",
+#----------------------------------
 "add shader error": "Fehler beim Start des Shaders",
 "animation exception - stopped": "Animationsfehler - angehalten",
 "empty shader code file {shader_filename}": "shader-datei {shader_filename} ist leer",

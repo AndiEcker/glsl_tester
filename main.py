@@ -8,6 +8,7 @@ import os
 from typing import Callable, Tuple, cast
 
 from ae.base import UNSET
+from ae.kivy_sideloading import SideloadingMainAppMixin
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.input import MotionEvent
@@ -26,7 +27,7 @@ from ae.kivy_app import KivyMainApp, get_txt
 from ae.kivy_glsl import ShadersMixin, circled_alpha_shader_code, touch_wave_shader_code, plasma_hearts_shader_code
 
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 
 BUILT_IN_SHADERS = dict(
@@ -49,7 +50,7 @@ class ShaderArgInput(BoxLayout):
     arg_name = StringProperty()
 
 
-class GlslTesterApp(KivyMainApp):
+class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
     """ main app class. """
     mouse_pos: Tuple[float, float]          #: current mouse pointer position in the render widget
     last_touch: MotionEvent                 #: last touch event: init=DefaultTouch(), update=RenderWidget.on_touch_down
@@ -63,6 +64,8 @@ class GlslTesterApp(KivyMainApp):
         """ ensure that the non-persistent app states are available before widget tree build. """
         super().on_app_start()
         self.change_app_state('next_shader', "")  # self.next_shader = self.framework_app.app_states['next_shader'] = ""
+        if self.sideloading_active:
+            self.on_sideloading_server_start("", dict())
 
     def on_app_started(self):
         """ initialize render_widget after kivy app and window got initialized. """
@@ -85,6 +88,10 @@ class GlslTesterApp(KivyMainApp):
         :param file_path:       path string of selected file.
         :param chooser_popup:   file chooser popup/container widget.
         """
+        if chooser_popup.submit_to == 'sideloading_file_mask':
+            super().on_file_chooser_submit(file_path, chooser_popup)  # pass selected file to SideloadingMainAppMixin
+            return
+
         if not os.path.isfile(file_path):
             self.show_message(get_txt("{file_path} is not a shader file"), title=get_txt("select single file"))
             file_path = ""

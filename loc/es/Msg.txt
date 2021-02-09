@@ -26,7 +26,112 @@ vibración actual: {round(state_value * 100)}%
 Usar la expression
 'lambda: main_app.vibration_volume'
 para cambiar valores del shader.""",
+#----------------------------------
+#---- OVERWRITING ae.gui_help -----
+"help_app_state#render_shader_frequency": """\
+ajustar la frequencia de la animación
+del shader.
+
+current frequency: {round(state_value)}Hz
+
+Moviendolo hacia la izquierda la
+animación automatica se desactivará
+y aparecerá un botón 'tick' para
+avanzar la animación de forma
+manualmente.""",
 #==================================
+"help_flow#add_renderer": """\
+tap to add a new
+instance of the
+specified shader
+file.""",
+"help_flow#del_renderer": """\
+tap to remove this
+running shader.""",
+"help_flow#shader_arg_alpha": """\
+enter a float value between
+0.0 and 1.0 to set the
+{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader argument.
+
+This value get interpreted
+by most shaders as opacity.
+
+To change this value dynamically
+on a running shader specify a
+lambda expression like e.g.
+'lambda: main_app.sound_volume'.""",
+"help_flow#shader_arg_center_pos": """\
+enter a tuple of two float
+values or a lambda expression
+to set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+shader argument.
+
+Most shaders use this value
+as center position (x,y)
+for the shader animation.
+
+The 'main_app.last_touch.pos'
+expression can be used
+to pass the last touch
+position on the render
+widget to the shader.
+""",
+"help_flow#shader_arg_contrast": """\
+enter a float value or
+a lambda expression to
+set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+shader argument.""",
+"help_flow#shader_arg_mouse": """\
+enter a tuple of two
+float values or a
+lambda expression to
+set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+shader argument.""",
+"help_flow#shader_arg_start_time": """\
+enter a float value or
+a lambda expression to
+set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+shader argument.""",
+"help_flow#shader_arg_tex_col_mix": """\
+enter a float value or
+a lambda expression to
+set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+shader argument.""",
+"help_flow#shader_arg_tint_ink": """\
+enter a tuple of four float values or
+a lambda expression to specify the
+{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader argument.
+
+Use one of the user preference colors
+in a lambda expression to dynamically
+change the color of a running shader.
+E.g. to use the Color 1 enter the lambda
+expression 'lambda: main_app.flow_id_ink'.
+
+Color 2 get represented by 'flow_path_ink',
+Color 3 by 'selected_item_ink' and
+Color 4 by 'unselected_item_ink'.""",
+"help_flow#shader_filename": """\
+enter the path of the
+shader code file or
+tap on the ... button
+on the right for to
+select a file via the
+file chooser.""",
+"help_flow#tick_render_shader": """\
+tap to manually advance the
+shader time by one tick.""",
+"help_flow#toggle_tool_box": """\
+tap for to {'open' if self.state == 'down' else 'close'} the
+tool box for to modify
+the shader arguments.""",
+#==================================
+#---- OVERWRITING ae.gui_help -----
+"flow_id_ink": "color 1{' (main_app.flow_id_ink)' if app.landscape else ''}",
+"flow_path_ink": "color 2{' (main_app.flow_path_ink)' if app.landscape else ''}",
+"selected_item_ink": "color 3{' (main_app.selected_item_ink)' if app.landscape else ''}",
+"unselected_item_ink": "color 4{' (main_app.unselected_item_ink)' if app.landscape else ''}",
+#----------------------------------
 "add shader error": "error en añadir un shader",
 "animation exception - stopped": "error de animación - suspendida",
 "empty shader code file {shader_filename}": "fichero de shader {shader_filename} es vacio",

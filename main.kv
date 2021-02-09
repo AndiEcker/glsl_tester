@@ -1,5 +1,6 @@
 #: import _d_ ae.kivy_dyn_chi
 #: import _f_ ae.kivy_file_chooser
+#: import _s_ ae.kivy_sideloading
 #: import _u_ ae.kivy_user_prefs
 #: import read_file_text ae.files.read_file_text
 <Main@BoxLayout>
@@ -18,6 +19,7 @@
         FlowButton:
             tap_flow_id: id_of_flow('add', 'renderer')
             icon_name: id_of_flow('add', 'item')
+            disabled: not app.app_states['next_shader']
             size_hint_x: None
             width: self.height
             relief_ellipse_inner_colors: relief_colors()
@@ -30,6 +32,8 @@
             width: self.height
             relief_ellipse_inner_colors: relief_colors()
             relief_ellipse_inner_lines: int(self.height / 3.9)
+        SideloadingButton:
+            id: sideloading_button
     Widget:
         size_hint_y: None
         height: '6sp'
@@ -60,6 +64,7 @@
             height: app.app_states['font_size'] * 1.8 if tool_box.visible else 0.0
             FlowInput:
                 background_color: self.background_color[:3] + [1.0 if tool_box.visible else 0.0]
+                focus_flow_id: 'shader_filename'
                 text: app.app_states['shader_filename']
                 on_text: app.main_app.change_app_state('shader_filename', self.text)
                 size_hint_y: None
@@ -129,6 +134,7 @@
         height: self.height if root.visible else 0.0
     FlowInput:
         background_color: self.background_color[:3] + [1.0 if root.visible else 0.0]
+        focus_flow_id: 'shader_arg_' + root.arg_name
         text: root.arg_name and app.app_states['shader_arg_' + root.arg_name]
         on_text: app.main_app.change_app_state('shader_arg_' + root.arg_name, self.text)
         sug_filename: os.path.join(norm_path("{sug}"), root.arg_name + "ShaderArg.txt")
