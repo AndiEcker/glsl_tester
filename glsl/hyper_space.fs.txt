@@ -2,7 +2,9 @@ $HEADER$
 
 uniform float alpha;
 uniform float contrast;
+uniform float tex_col_mix;
 uniform float time;
+uniform vec2 pos;
 uniform vec2 resolution;
 uniform vec2 center_pos;
 
@@ -85,12 +87,16 @@ Ray updateRay(Ray r) {
 }
 
 void main( void ) {
- vec2 position = 2.0 * (gl_FragCoord.xy / resolution.xy - 0.5);
+ vec2 position = 2.0 * ((gl_FragCoord.xy - pos) / resolution.xy - 0.5);
  position.x *= resolution.x / resolution.y;
  Ray r = getRay(position);
  for(int i = 0; i < MAX_STEPS; ++i) {
   r = updateRay(r);
  }
- vec4 tex = texture2D(texture0, tex_coord0);
- gl_FragColor = r.color / r.color.a;
+ vec4 col = r.color / r.color.a;
+ if (tex_col_mix != 0.0) {
+  vec4 tex = texture2D(texture0, tex_coord0);
+  col = mix(tex, col, tex_col_mix);
+ }
+ gl_FragColor = col;
 }

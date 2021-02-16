@@ -5,7 +5,9 @@
 $HEADER$
 
 uniform float alpha;
+uniform float tex_col_mix;
 uniform float time;
+uniform vec2 pos;
 uniform vec2 resolution;
 
 // Emulate some GLSL ES 3.x
@@ -150,7 +152,7 @@ float AO (float eps,vec3 n, vec3 p) {
 }
 
 void main(void) {
-  vec2 uv = (2.*gl_FragCoord.xy-resolution.xy) / resolution.y;
+  vec2 uv = (2.*(gl_FragCoord.xy - pos) - resolution.xy) / resolution.y;
 
   float dither = hash21(uv);
   vec3 ro = vec3(0.3,0.01,-6.), rd=getcam(ro,vec3(.5,-7.,0.),uv),p=ro, col=vec3(0.);
@@ -178,7 +180,10 @@ void main(void) {
   }
   col = mix(col,vec3(0.,0.05,0.1),1.-exp(-0.001*t*t));
   col += g1*vec3(0.1,0.8,0.2)*0.8;
-  
+  col = sqrt(col);
+  if (tex_col_mix != 0.0) {
+   vec4 tex = texture2D(texture0, tex_coord0);
+   col = mix(tex.rgb, col, tex_col_mix);
+  }
   gl_FragColor = vec4(sqrt(col),alpha);
-  vec4 tex = texture2D(texture0, tex_coord0);
 }

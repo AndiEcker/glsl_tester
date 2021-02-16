@@ -1,7 +1,9 @@
 $HEADER$
 
 uniform float alpha;
+uniform float tex_col_mix;
 uniform float time;
+uniform vec2 pos;
 uniform vec2 resolution;
 
 #define rot(a) mat2(cos(a), sin(a), -sin(a), cos(a))
@@ -33,9 +35,8 @@ float map(vec3 p) {
 }
 
 void main( void ) {
- gl_FragColor.w = 1.0;
- vec2 uv = (gl_FragCoord.xy - 0.5 * resolution) / resolution.y;
- vec4 tex = texture2D(texture0, tex_coord0);
+ gl_FragColor.w = alpha;  // 1.0;
+ vec2 uv = ((gl_FragCoord.xy - pos) - 0.5 * resolution) / resolution.y;
 
  vec3 rd = normalize(vec3(uv, 1.0));
  vec3 p = vec3(0.0, 0.0, -3.0);
@@ -43,7 +44,12 @@ void main( void ) {
    float d = map(p);
    p += rd * d;
    if (d < 0.001) {
-     gl_FragColor.rgb = mix(vec3(1), cos(vec3(1.0, 9.0, 3.0) + log2(scale)) * 0.5 + 0.5, 0.5) * 10.0 / float(i);
+     vec3 col = mix(vec3(1), cos(vec3(1.0, 9.0, 3.0) + log2(scale)) * 0.5 + 0.5, 0.5) * 10.0 / float(i);
+     if (tex_col_mix != 0.0) {
+      vec4 tex = texture2D(texture0, tex_coord0);
+      col = mix(tex.rgb, col, tex_col_mix);
+     }
+     gl_FragColor.rgb = col;
      gl_FragColor.a = alpha;
      break;
    }

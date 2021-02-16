@@ -3,7 +3,9 @@
 $HEADER$
 
 uniform float alpha;
+uniform float tex_col_mix;
 uniform float time;
+uniform vec2 pos;
 uniform vec2 resolution;
 
 // Emulate some GLSL ES 3.x
@@ -12,8 +14,6 @@ float tanh(float x) {
   return ((ex - 1.) / (ex + 1.));
 }
 
-#define TIME            time
-#define RESOLUTION      resolution
 #define PI              3.141592654
 #define TAU             (2.0*PI)
 #define L2(x)           dot(x, x)
@@ -41,8 +41,8 @@ float apollian(vec4 p, float s) {
 
 float weird(vec2 p) {
   float z = 4.0;
-  p *= ROT(TIME*0.1);
-  float tm = 0.2*TIME;
+  p *= ROT(time*0.1);
+  float tm = 0.2*time;
   float r = 0.5;
   vec4 off = vec4(r*PSIN(tm*sqrt(3.0)), r*PSIN(tm*sqrt(1.5)), r*PSIN(tm*sqrt(2.0)), 0.0);
   vec4 pp = vec4(p.x, p.y, 0.0, 0.0)+off;
@@ -62,7 +62,7 @@ float df(vec2 p) {
 }
 
 vec3 color(vec2 p) {
-  float aa   = 2.0/RESOLUTION.y;
+  float aa   = 2.0/resolution.y;
   const float lw = 0.0235;
   const float lh = 1.25;
 
@@ -105,7 +105,7 @@ vec3 color(vec2 p) {
   col       += vec3(1.0, 1.0, 1.0)*(1.0-exp(-ss*(max((sd1+0.0*lw), 0.0))))/bl21;
   col       += vec3(0.5)*(1.0-exp(-ss*(max((sd2+0.0*lw), 0.0))))/bl22;
   float l   = length(p);
-  float hue = fract(0.75*l-0.3*TIME)+0.3+0.15;
+  float hue = fract(0.75*l-0.3*time)+0.3+0.15;
   float sat = 0.75*tanh(2.0*l);
   vec3 hsv  = vec3(hue, sat, 1.0);
   vec3 bcol = hsv2rgb(hsv);
@@ -125,12 +125,15 @@ vec3 postProcess(vec3 col, vec2 q)  {
 }
 
 void main(void) {
-  vec2 q = gl_FragCoord.xy / RESOLUTION.xy;
+  vec2 q = (gl_FragCoord.xy - pos) / resolution;
   vec2 p = -1. + 2. * q;
-  p.x *= RESOLUTION.x / RESOLUTION.y;
+  p.x *= resolution.x / resolution.y;
   vec3 col = color(p);
   col = postProcess(col, q);
   
-  vec4 tex = texture2D(texture0, tex_coord0);
+  if (tex_col_mix != 0.0) {
+   vec4 tex = texture2D(texture0, tex_coord0);
+   col = mix(tex.rgb, col, tex_col_mix);
+  }
   gl_FragColor = vec4(col, alpha);
 }

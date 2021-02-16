@@ -1,13 +1,10 @@
-#: import _d_ ae.kivy_dyn_chi
-#: import _f_ ae.kivy_file_chooser
-#: import _s_ ae.kivy_sideloading
 #: import _u_ ae.kivy_user_prefs
 #: import read_file_text ae.files.read_file_text
 <Main@BoxLayout>
     orientation: 'vertical'
     BoxLayout:
         size_hint_y: None
-        height: app.app_states['font_size'] * 1.8 * (1 + 2 * app.main_app.debug_level)
+        height: app.app_states['font_size'] * 1.5 * (1 + 2 * app.main_app.debug_level)
         spacing: '3sp'
         HelpToggler:
         UserPreferencesButton:

@@ -5,7 +5,9 @@
 $HEADER$
 
 uniform float alpha;
+uniform float tex_col_mix;
 uniform float time;
+uniform vec2 pos;
 uniform vec2 resolution;
 
 #define PI  3.141592654
@@ -109,8 +111,7 @@ vec3 post(vec3 col, vec2 q) {
 }
 
 void main(void) {
-  vec2 q=gl_FragCoord.xy / resolution.xy;
-  vec4 tex = texture2D(texture0, tex_coord0);
+  vec2 q = (gl_FragCoord.xy - pos) / resolution.xy;
   vec2 uv = -1.0 + 2.0*q;
   uv.y += 0.225;
   uv.x*=resolution.x/resolution.y;
@@ -139,5 +140,9 @@ void main(void) {
   }
 
   col=post(col, q);
-  gl_FragColor=vec4(col.x,col.y,col.z,alpha);
+  if (tex_col_mix != 0.0) {
+   vec4 tex = texture2D(texture0, tex_coord0);
+   col = mix(tex.rgb, col, tex_col_mix);
+  }
+  gl_FragColor=vec4(col, alpha);
 }

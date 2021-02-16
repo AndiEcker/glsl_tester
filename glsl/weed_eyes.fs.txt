@@ -1,7 +1,9 @@
 $HEADER$
 
 uniform float alpha;
+uniform float tex_col_mix;
 uniform float time;
+uniform vec2 pos;
 uniform vec2 resolution;
 uniform vec2 mouse;
 
@@ -27,7 +29,7 @@ vec2 spiralzoom(vec2 domain, vec2 center, float n, float spiral_factor, float zo
 }
 
 void main( void ) {
- vec2 uv = gl_FragCoord.xy / resolution.xy;
+ vec2 uv = (gl_FragCoord.xy - pos) / resolution.xy;
  uv = 0.5 + (uv - 0.5)*vec2(resolution.x/resolution.y,1.);
  vec2 p1 = vec2(0.2,0.5);
  vec2 p2 = vec2(0.8, 0.5);
@@ -36,7 +38,8 @@ void main( void ) {
  vec2 spiral_uv = spiralzoom(moebius,vec2(0.),8.,-.5,1.8,vec2(0.5,0.5)*time*0.5);
  vec2 spiral_uv2 = spiralzoom(moebius,vec2(0.),3.,.9,1.2,vec2(-0.5,0.5)*time*.8);
  vec2 spiral_uv3 = spiralzoom(moebius,vec2(0.),5.,.75,4.0,-vec2(0.5,0.5)*time*.7);
- gl_FragColor = vec4(border(spiral_uv,0.9), border(spiral_uv2,0.9), border(spiral_uv3,0.9), alpha);
+ vec4 col = vec4(border(spiral_uv,0.9), border(spiral_uv2,0.9), border(spiral_uv3,0.9), alpha);
+
  vec2 weed_uv = (uv);
  weed_uv.y += 0.38;
  float w = 0.05 * mouse.y / resolution.y;
@@ -44,8 +47,12 @@ void main( void ) {
  float o = atan(weed_uv.y, weed_uv.x);
  r *= (1.+sin(o+(time*0.09)))*(1.+0.9 * cos(8.*o))*(1.+0.1*cos(24.*o))*(0.9+0.05*cos(200.*o));
  float l = length(weed_uv);
-
  float d = clamp(1.-abs(l - r + w*2.)/w, 0., 1.);
- gl_FragColor *= 1.-d;
- vec4 tex = texture2D(texture0, tex_coord0);
+ col *= 1.-d;
+
+ if (tex_col_mix != 0.0) {
+  vec4 tex = texture2D(texture0, tex_coord0);
+  col = mix(tex, col, tex_col_mix);
+ }
+ gl_FragColor = col;
 }

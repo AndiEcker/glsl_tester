@@ -9,24 +9,22 @@
 $HEADER$
 
 uniform float alpha;
+uniform float tex_col_mix;
 uniform float time;
+uniform vec2 pos;
 uniform vec2 resolution;
-
-float deltax = 12.0 + sin(time*0.4) * 10.0;   // scale
-float deltay = resolution.y / resolution.x * deltax;
-float theta = time*0.1;         // rotation speed
 
 mat2 rotate2d (float angle)    // create 2d rotation matrix
 {
- float ca = cos(angle),  sa = sin(angle);
+ float ca = cos(angle);
+ float sa = sin(angle);
  return mat2(ca, -sa, sa, ca);
 }
 
 // for pretty colors: Hue-Saturation-Value to Red-Green-Blue
-vec4 hsvToRgb(vec3 hsv) 
+vec3 hsvToRgb(vec3 hsv)
 {
- vec3 rgb = ((clamp(abs(fract(hsv.x +vec3(0.,2./3.,1./3.))*2.-1.)*3.-1.,0.,1.)-1.)*hsv.y+1.)*hsv.z;
- return vec4 (rgb,1.0);
+ return ((clamp(abs(fract(hsv.x + vec3(0.,2./3.,1./3.))*2.-1.)*3.-1.,0.,1.)-1.)*hsv.y+1.)*hsv.z;
 }
 
 // complex number multiplication: a * b
@@ -95,12 +93,20 @@ vec2 newtonFractal(vec2 z)
 
 void main(void)
 {
-  //vec2 uv = vec2(deltax,deltay) * (gl_FragCoord.xy / resolution.xy - 0.5);
-  vec2 uv = (gl_FragCoord.xy - resolution.xy*0.5)/min(resolution.x, resolution.y)*deltax;
+  // shader compile error on Android if these variables get moved to module level (after uniform declarations).
+  float deltax = 12.0 + sin(time*0.4) * 10.0;   // scale
+  float deltay = resolution.y / resolution.x * deltax;
+  float theta = time*0.1;         // rotation speed
+
+  vec2 uv = vec2(deltax,deltay) * ((gl_FragCoord.xy - pos) / resolution.xy - 0.5);
+  //vec2 uv = (gl_FragCoord.xy - pos - resolution.xy*0.5)/min(resolution.x, resolution.y)*deltax;
   uv *= rotate2d (theta);
   vec2 results = newtonFractal(uv);  // calculate newton fractal
-  vec3 hsv = vec3(results.x + results.y, 0.8, 1.0 - results.y);
+  vec3 col = hsvToRgb(vec3(results.x + results.y, 0.8, 1.0 - results.y));
 	
-  gl_FragColor = vec4(hsvToRgb(hsv).rgb, alpha);
-  vec4 tex = texture2D(texture0, tex_coord0);
+  if (tex_col_mix != 0.0) {
+   vec4 tex = texture2D(texture0, tex_coord0);
+   col = mix(tex.rgb, col, tex_col_mix);
+  }
+  gl_FragColor = vec4(col, alpha);
 }

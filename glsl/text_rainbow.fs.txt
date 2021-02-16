@@ -3,8 +3,10 @@
 $HEADER$
 
 uniform float alpha;
+uniform float tex_col_mix;
 uniform float time;
 uniform float contrast;
+uniform vec2 pos;
 uniform vec2 resolution;
 
 #define line1 _ y_ o_ u_ _ a_ r_ e_ _ a_ crlf
@@ -305,7 +307,7 @@ void main(void) {
  spacing.y = spacing.x*.5;
  spacing.z = 1./spacing.x;
  float scale = 1.0;
- vec2 uv = ((gl_FragCoord.xy-0.5*resolution.xy)/resolution.xx)*40.;
+ vec2 uv = ((gl_FragCoord.xy - pos - 0.5*resolution.xy)/resolution.xx)*40.;
  vec2 p = uv;
  uv.x*=1.+sin(uv.y*.2-time)*.05;
  uv.y*=1.+cos(uv.x*.5+time)*.1;
@@ -320,6 +322,9 @@ void main(void) {
  // c = mix(c, vec3(0.), smoothstep(.5, .4, x));
  float v = smoothstep(.2, .3, x);
  c = mix( sin(vec3(0., .33, .66)*7.+p.x+p.y+time)*.3+.9, c*smoothstep(15., 5., x), v);
+ if (tex_col_mix != 0.0) {
+  vec4 tex = texture2D(texture0, tex_coord0);
+  c = mix(tex.rgb, c, tex_col_mix);
+ }
  gl_FragColor = vec4(c, alpha);  // vec4(clamp(clr,0.0,1.0),alpha);
- vec4 tex = texture2D(texture0, tex_coord0);
 }

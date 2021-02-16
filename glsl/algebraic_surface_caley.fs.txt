@@ -7,6 +7,7 @@ uniform float contrast;
 uniform float tex_col_mix;
 uniform float time;
 uniform vec2 mouse;
+uniform vec2 pos;
 uniform vec2 resolution;
 uniform vec4 tint_ink;
 
@@ -120,7 +121,7 @@ mat4 A = mat4( //polynomial interpolation for base points 0, 5, 10, 15 (better u
 );  //octave: inv(fliplr(vander([0,5,10,15])))'
 
 void main( void ) {
-  vec2 pos = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y)*4.;
+  vec2 pos = ((gl_FragCoord.xy - pos) * 2.0 - resolution) / min(resolution.x, resolution.y)*4.;
   //pos.y *= resolution.y/resolution.x;
   vec4 tex = texture2D(texture0, tex_coord0);
 

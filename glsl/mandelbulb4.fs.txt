@@ -2,10 +2,12 @@
 $HEADER$
 
 uniform float alpha;
-uniform vec2 resolution;
+uniform float contrast;
+uniform float tex_col_mix;
 uniform float time;
+uniform vec2 pos;
+uniform vec2 resolution;
 
-float PI=3.14159265;
 #define Power 8.0
 #define Bailout 4.0
 
@@ -55,10 +57,11 @@ vec3 DEColor(vec3 pos) {
 }
 
 void main(void){
-  vec2 vPos=-1.0+2.0*gl_FragCoord.xy/resolution.xy;
+  float PI=3.14159265;
+  vec2 vPos=-1.0+2.0*(gl_FragCoord.xy - pos)/resolution.xy;
 
   //Camera animation
-  vec3 vuv=vec3(0,1,0);//Change camera up vector here
+  vec3 vuv=vec3(0,1,0);  //Change camera up vector here
   vec3 vrp=vec3(0,.5,0); //Change camera view here
   float mx=time * 0.1*PI*2.0;
   float my=time * 0.1*PI/2.01;
@@ -86,14 +89,19 @@ void main(void){
     if (abs(s)<.0025||f>maxd) break;
   }
 
+  vec4 col;
   if (f<maxd){
     n=normalize(vec3(s-DE(p-e.xyy), s-DE(p-e.yxy), s-DE(p-e.yyx)));
     c = DEColor(p);
     c.yz = mix(c.yz, n.yz, 0.3);
     float b=dot(n,normalize(prp-p));  
-    gl_FragColor = mix(vec4((b*c+pow(b,16.0))*(1.0-f*.01),1.0), vec4(c,1.0),alpha);  // 0.58);
+    col = mix(vec4((b*c+pow(b,16.0))*(1.0-f*.01),alpha), vec4(c,alpha),1.0 - contrast);  // 0.58);
   }
-  else gl_FragColor=vec4(0.0,0.0,0.0,alpha); //background color
-  vec4 tex = texture2D(texture0, tex_coord0);
+  else col = vec4(0.0,0.0,0.0,alpha); //background color
+  if (tex_col_mix != 0.0) {
+   vec4 tex = texture2D(texture0, tex_coord0);
+   col = mix(tex, col, tex_col_mix);
+  }
+  gl_FragColor = col;
 }
 
