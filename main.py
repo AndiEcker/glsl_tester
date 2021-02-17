@@ -27,7 +27,7 @@ from ae.kivy_app import KivyMainApp, get_txt
 from ae.kivy_glsl import ShadersMixin, BUILT_IN_SHADERS
 
 
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 
 class DefaultTouch(MotionEvent):
@@ -228,8 +228,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
                 kwargs['shader_file'] = screen_shader_dict['shader_file']
             else:
                 kwargs['shader_code'] = screen_shader_dict['shader_code']
-            glsl_args = screen_shader_dict['glsl_dyn_args'].copy()
-            glsl_args.pop('time')
+            glsl_args = {key: val for key, val in screen_shader_dict['glsl_dyn_args'].items() if key != 'time'}
             shader_button.debug_shader_idx = shader_button.add_renderer(**kwargs, **glsl_args)
         else:
             shader_button.del_renderer(shader_button.debug_shader_idx)

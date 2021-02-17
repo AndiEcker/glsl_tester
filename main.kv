@@ -10,6 +10,8 @@
         UserPreferencesButton:
             size_hint_x: None
             width: self.height
+        FileChooserButton:
+            visible: not tool_box.visible
         RunningShaders:
             spacing: '3sp'
             id: running_shaders
@@ -18,7 +20,7 @@
             icon_name: id_of_flow('add', 'item')
             disabled: not app.app_states['next_shader']
             size_hint_x: None
-            width: self.height
+            width: self.height * (2.1 if app.landscape else 1.0)
             relief_ellipse_inner_colors: relief_colors()
             relief_ellipse_inner_lines: int(self.height / 4.5)
             relief_ellipse_inner_offset: int(self.height / 7.5)
@@ -70,18 +72,8 @@
                 on_auto_complete_texts:
                     write_file_text(self.auto_complete_texts, norm_path("{ado}/ShaderFilenameSuggestions.txt"))
                 on_text: app.main_app.update_shader_file()
-            OptionalButton:
-                tap_flow_id: id_of_flow('open', 'file_chooser')
-                tap_kwargs:
-                    update_tap_kwargs(self, popup_kwargs=dict(
-                    initial_path=app.app_states['file_chooser_initial_path'] or norm_path("{ado}") or ".", \
-                    submit_to='shader_filename'))
-                text: "..."
-                size_hint_x: None
-                width: self.height
+            FileChooserButton:
                 visible: tool_box.visible
-                relief_ellipse_inner_colors: relief_colors()
-                relief_ellipse_inner_lines: int(self.height / 3.9)
             OptionalButton:
                 tap_flow_id: id_of_flow('tick', 'render_shader')
                 visible:
@@ -99,6 +91,19 @@
 
 <RenderWidget@ShadersMixin+ImageLabel>
     on_touch_down: if self.collide_point(*args[1].pos): app.main_app.last_touch = args[1]
+
+
+<FileChooserButton@OptionalButton>
+    tap_flow_id: id_of_flow('open', 'file_chooser')
+    tap_kwargs:
+        update_tap_kwargs(self, popup_kwargs=dict(
+        initial_path=app.app_states['file_chooser_initial_path'] or norm_path("{ado}") or ".", \
+        submit_to='shader_filename'))
+    text: "..."
+    size_hint_x: None
+    width: self.height
+    relief_ellipse_inner_colors: relief_colors()
+    relief_ellipse_inner_lines: int(self.height / 3.9)
 
 
 <ShaderButton@ShadersMixin+FlowButton>:
