@@ -28,7 +28,7 @@ expression for to dynamically change
 shader arguments.""",
 #----------------------------------
 #---- OVERWRITING ae.gui_help -----
-"help_app_state#render_shader_frequency": """\
+"help_app_state#render_frequency": """\
 adjust the animation frequency of the
 shader ticker.
 
@@ -44,7 +44,12 @@ tap to add a new
 instance of the
 specified shader
 file.""",
-"help_flow#del_renderer": """\
+"help_flow#open_file_chooser:shader_filename": """\
+tap to open the
+file chooser to
+load the next
+shader file.""",
+"help_flow#remove_renderer": """\
 tap to remove this
 running shader.""",
 "help_flow#shader_arg_alpha": """\
@@ -127,7 +132,7 @@ tap on the ... button
 on the right for to
 select a file via the
 file chooser.""",
-"help_flow#tick_render_shader": """\
+"help_flow#next_render_tick": """\
 tap to manually advance the
 shader time by one tick.""",
 "help_flow#toggle_tool_box": """\

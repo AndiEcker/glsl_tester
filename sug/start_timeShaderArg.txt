@@ -1,3 +1,5 @@
 None
 0.0
 Clock.get_boottime()
+-Clock.get_boottime() / 3.0
+lambda: Clock.get_boottime()

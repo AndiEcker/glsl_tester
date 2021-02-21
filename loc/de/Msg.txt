@@ -29,7 +29,7 @@ Ausdruck zum dynamischen Ändern von
 shader Argumenten verwendbar.""",
 #----------------------------------
 #---- OVERWRITING ae.gui_help -----
-"help_app_state#render_shader_frequency": """\
+"help_app_state#render_frequency": """\
 animations-frequenz des shader-zeitgebers.
 
 aktuelle frequenz: {round(state_value)}Hz
@@ -44,7 +44,12 @@ zeit-einheit weiterbewegt werden kann.""",
 tippe um eine neue Instanz
 der angegebenen shader-datei
 zu erstellen.""",
-"help_flow#del_renderer": """\
+"help_flow#open_file_chooser:shader_filename": """\
+tippe um das datei-
+auswahl-fenster zu
+öffnen um die shader-
+datei auszuwählen.""",
+"help_flow#remove_renderer": """\
 tippe um diesen laufenden
 shader zu entfernen.""",
 "help_flow#shader_arg_alpha": """\
@@ -140,7 +145,7 @@ zeichenfolge 'lambda: ' voraus.""",
 gib den pfad der shader-datei ein oder
 tippe auf die ...-schaltfläche rechts
 daneben um eine shader-datei auszuwählen.""",
-"help_flow#tick_render_shader": """\
+"help_flow#next_render_tick": """\
 tippe um (bei deaktiviertem
 shader-zeitgeber) die shader-
 animation manuell auf den
@@ -156,14 +161,19 @@ zu {'öffnen' if self.state == 'down' else 'schließen'}.""",
 "selected_item_ink": "farbe 3{' (main_app.selected_item_ink)' if app.landscape else ''}",
 "unselected_item_ink": "farbe 4{' (main_app.unselected_item_ink)' if app.landscape else ''}",
 #----------------------------------
-"add shader error": "Fehler beim Start des Shaders",
+"add shader error": "Shader-Start-Fehler",
+"alpha": "transparenz",
 "animation exception - stopped": "Animationsfehler - angehalten",
+"center_pos": "zentral-pos.",
+"contrast": "kontrast",
 "empty shader code file {shader_filename}": "shader-datei {shader_filename} ist leer",
 "{file_path} is not a shader file": "{file_path} ist keine shader-datei",
-"invalid expression in shader argument {arg_name}": "Der Ausdruck {arg_name} ist fehlerhaft",
+"invalid expression in shader argument {arg_name}={arg_inp}": "Der Ausdruck {arg_name}={arg_inp} ist fehlerhaft",
 "missing 'shader_arg_{arg_name}' app state": "'shader_arg_{arg_name}' app state existiert nicht",
+"mouse": "maus-pos.",
 "no vertex/fragment sections in shader {shader_filename}":
     "vertex/fragment Abschnitte fehlen im shader {shader_filename}",
 "shader compilation/start failed: {ex}": "Shader-Start-Fehler: {ex}",
 "shader file {shader_filename} not found": "shader-datei {shader_filename} existiert nicht",
+"tint_ink": "farbe",
 }

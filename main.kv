@@ -75,9 +75,9 @@
             FileChooserButton:
                 visible: tool_box.visible
             OptionalButton:
-                tap_flow_id: id_of_flow('tick', 'render_shader')
+                tap_flow_id: id_of_flow('next', 'render_tick')
                 visible:
-                    app.app_states['render_shader_frequency'] == app.main_app.get_var('render_shader_frequency_min') \
+                    app.app_states['render_frequency'] == app.main_app.get_var('render_frequency_min') \
                     and tool_box.visible
                 text: "tick"
                 relief_square_inner_colors: relief_colors() if tool_box.visible else ()
@@ -89,16 +89,16 @@
         size_hint_y: 1
 
 
-<RenderWidget@ShadersMixin+ImageLabel>
+<RenderWidget@ImageLabel+ShadersMixin>
     on_touch_down: if self.collide_point(*args[1].pos): app.main_app.last_touch = args[1]
 
 
 <FileChooserButton@OptionalButton>
-    tap_flow_id: id_of_flow('open', 'file_chooser')
+    tap_flow_id: id_of_flow('open', 'file_chooser', 'shader_filename')
     tap_kwargs:
         update_tap_kwargs(self, popup_kwargs=dict(
         initial_path=app.app_states['file_chooser_initial_path'] or norm_path("{ado}") or ".", \
-        submit_to='shader_filename'))
+        submit_to='shader_filename', filters=['*.glsl']))
     text: "..."
     size_hint_x: None
     width: self.height
@@ -106,20 +106,22 @@
     relief_ellipse_inner_lines: int(self.height / 3.9)
 
 
-<ShaderButton@ShadersMixin+FlowButton>:
-    debug_shader_idx: -1
-    tap_flow_id: id_of_flow('del', 'renderer', self.text)
+<ShaderButton>
+    tap_flow_id: id_of_flow('del', 'renderer')
+    tap_kwargs: dict(big_shader_id=self.big_shader_id)
     size_hint_y: None
     height: self.parent.height if self.parent else self.height
     relief_ellipse_inner_colors: relief_colors()
     relief_ellipse_inner_lines: int(self.height / 3.9)
-    on_parent: app.main_app.update_debug_shader(self)
 
 <RunningShaders@DynamicChildrenBehavior+GridLayout>
     rows: 1
     registered_renderers: []
     child_data_maps:
-        [dict(cls='ShaderButton', kwargs=dict(text=str(dic['renderer_idx']))) for dic in self.registered_renderers]
+        [dict(cls='ShaderButton',
+        kwargs=dict(text=_("remove"), added_shaders=[dic]),
+        attributes=dict(big_shader_id=dic['_shader_id']))
+        for dic in self.registered_renderers]
     canvas:
 
 
@@ -154,8 +156,8 @@
 
 <UserPreferencesPopup>:
     AppStateSlider:
-        app_state_name: 'render_shader_frequency'
+        app_state_name: 'render_frequency'
         cursor_image:
             app.main_app.img_file('timer_frequency', app.app_states['font_size'], app.app_states['light_theme'])
-        min: app.main_app.get_var('render_shader_frequency_min')
-        max: app.main_app.get_var('render_shader_frequency_max')
+        min: app.main_app.get_var('render_frequency_min')
+        max: app.main_app.get_var('render_frequency_max')

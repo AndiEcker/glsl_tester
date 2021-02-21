@@ -28,7 +28,7 @@ Usar la expression
 para cambiar valores del shader.""",
 #----------------------------------
 #---- OVERWRITING ae.gui_help -----
-"help_app_state#render_shader_frequency": """\
+"help_app_state#render_frequency": """\
 ajustar la frequencia de la animación
 del shader.
 
@@ -41,90 +41,92 @@ avanzar la animación de forma
 manualmente.""",
 #==================================
 "help_flow#add_renderer": """\
-tap to add a new
-instance of the
-specified shader
-file.""",
-"help_flow#del_renderer": """\
-tap to remove this
-running shader.""",
+puntea ese botón para
+arrancar un nueva
+instancia del shader
+cargado.""",
+"help_flow#open_file_chooser:shader_filename": """\
+puntea para abrir
+y cargar un nuevo
+fichero de shader.""",
+"help_flow#remove_renderer": """\
+puntea para detener
+el shader arrancado.""",
 "help_flow#shader_arg_alpha": """\
-enter a float value between
-0.0 and 1.0 to set the
-{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader argument.
+introducir un valor de
+punto flotante entre
+0.0 y 1.0 para el
+argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.
 
-This value get interpreted
-by most shaders as opacity.
+Este número esta
+interpretado por la
+mayoria de los shaders
+como opacidad.
 
-To change this value dynamically
-on a running shader specify a
-lambda expression like e.g.
+Para ajustar ese valor
+dinamicamente por un
+shader arrancado, introduce
+lo como una expressión
+lambda, como por ejemplo
 'lambda: main_app.sound_volume'.""",
 "help_flow#shader_arg_center_pos": """\
-enter a tuple of two float
-values or a lambda expression
-to set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
-shader argument.
+introduzca una lista dos valores de
+punto flotante o una expressión de lambda
+para especificar el argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.
 
-Most shaders use this value
-as center position (x,y)
-for the shader animation.
+La mayoria de los shaders usa este valor
+como posición central (x,y) de la animación.
 
-The 'main_app.last_touch.pos'
-expression can be used
-to pass the last touch
-position on the render
-widget to the shader.
+También se puede usar por ejemplo la
+expresión 'main_app.last_touch.pos'.
 """,
 "help_flow#shader_arg_contrast": """\
-enter a float value or
-a lambda expression to
-set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
-shader argument.""",
+introduzca un valor de punto flotante o
+una expresión lambda para especificar
+el argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+del shader.""",
 "help_flow#shader_arg_mouse": """\
-enter a tuple of two
-float values or a
-lambda expression to
-set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
-shader argument.""",
+introduzca una lista dos valores de
+punto flotante o una expressión de lambda
+para especificar el argumento
+{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.""",
 "help_flow#shader_arg_start_time": """\
-enter a float value or
-a lambda expression to
-set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
-shader argument.""",
+introduzca un valor de punto flotante o
+una expresión lambda para especificar
+el argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+del shader.""",
 "help_flow#shader_arg_tex_col_mix": """\
-enter a float value or
-a lambda expression to
-set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
-shader argument.""",
+introduzca un valor de punto flotante o
+una expresión lambda para especificar
+el argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+del shader.""",
 "help_flow#shader_arg_tint_ink": """\
-enter a tuple of four float values or
-a lambda expression to specify the
-{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader argument.
+introduzca una lista cuatro valores de
+punto flotante o una expressión de lambda
+para especificar el argumento
+{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.
 
-Use one of the user preference colors
-in a lambda expression to dynamically
-change the color of a running shader.
-E.g. to use the Color 1 enter the lambda
-expression 'lambda: main_app.flow_id_ink'.
+Usa una de los color del menu de los
+preferencias de usuario, por ejemplo
+el Color 1 en una expresión de lambda
+como 'lambda: main_app.flow_id_ink'.
 
-Color 2 get represented by 'flow_path_ink',
-Color 3 by 'selected_item_ink' and
-Color 4 by 'unselected_item_ink'.""",
+El Color 2 es representado como
+'flow_path_ink',
+el Color 3 como 'selected_item_ink' y
+el Color 4 como 'unselected_item_ink'.""",
 "help_flow#shader_filename": """\
-enter the path of the
-shader code file or
-tap on the ... button
-on the right for to
-select a file via the
-file chooser.""",
-"help_flow#tick_render_shader": """\
-tap to manually advance the
-shader time by one tick.""",
+introduzca la ruta del fichero del
+shader que quieres arrancar o puntea
+el botón ... a la derecha para
+seleccionarlo.""",
+"help_flow#next_render_tick": """\
+puntea para avanzar la animación
+del shader por un tick.""",
 "help_flow#toggle_tool_box": """\
-tap for to {'open' if self.state == 'down' else 'close'} the
-tool box for to modify
-the shader arguments.""",
+puntea para {'abrir' if self.state == 'down' else 'cerrar'} la
+ventanita para introducir los
+valores/argumentos del shader.""",
 #==================================
 #---- OVERWRITING ae.gui_help -----
 "flow_id_ink": "color 1{' (main_app.flow_id_ink)' if app.landscape else ''}",
@@ -133,13 +135,18 @@ the shader arguments.""",
 "unselected_item_ink": "color 4{' (main_app.unselected_item_ink)' if app.landscape else ''}",
 #----------------------------------
 "add shader error": "error en añadir un shader",
+"alpha": "opacidad",
 "animation exception - stopped": "error de animación - suspendida",
+"center_pos: "pos. central",
+"contrast": "contraste",
 "empty shader code file {shader_filename}": "fichero de shader {shader_filename} es vacio",
 "{file_path} is not a shader file": "{file_path} no es un fichero de código de shader",
-"invalid expression in shader argument {arg_name}": "la expresión de {arg_name} no es válida",
+"invalid expression in shader argument {arg_name}": "la expresión de {arg_name}={arg_inp} no es válida",
 "missing 'shader_arg_{arg_name}' app state": "el 'shader_arg_{arg_name}' app state no existe",
+"mouse": "pos. ratón",
 "no vertex/fragment sections in shader {shader_filename}":
     "faltan los secciones de vertex/fragment en {shader_filename}",
 "shader compilation/start failed: {ex}": "error '{ex}' en arrancar el shader",
 "shader file {shader_filename} not found": "el fichero de shader {shader_filename} no existe",
+"tint_ink": "color",
 }
