@@ -29,7 +29,22 @@ from ae.kivy_glsl import ShadersMixin, BUILT_IN_SHADERS
 from ae.kivy_sideloading import SideloadingMainAppMixin
 
 
-__version__ = '0.0.9'
+__version__ = '0.0.10'
+
+
+def field_calc_key(value: Tuple[float, float], matrix: str, key: str) -> Tuple[float, float]:
+    """
+    :param value:               current field value.
+    :param matrix:              field char matrix.
+    :param key:                 input key character
+    :return:                    new field value.
+    """
+    idx = matrix.find(key)
+    if idx == 4:
+        return 0.0, 0.0
+    if idx != -1:
+        return value[0] + (idx % 3 - 1) / 10.0, value[1] + (int(idx / 3) - 1) / 10.0
+    return value
 
 
 class DefaultTouch(MotionEvent):
@@ -55,14 +70,36 @@ class ShaderButton(FlowButton):
 
 class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
     """ main app class. """
-    mouse_pos: Tuple[float, float]          #: current mouse pointer position in the shader widget
+    e_field_pos: Tuple[float, float]        #: e-key input field
+    i_field_pos: Tuple[float, float]        #: i-key input field
+    last_key: float                         #: last key ord code
     last_touch: MotionEvent                 #: last touch event: init=DefaultTouch(), update=RenderWidget.on_touch_down
+    mouse_pos: Tuple[float, float]          #: current mouse pointer position in the shader widget
     next_shader: str                        #: non-persistent app state holding the code of the next shader to add
     render_frequency: float                 #: renderer tick timer frequency
     render_widget: ShadersMixin             #: widget for to display shader output
     shader_filename: str                    #: current shader filename app state
 
     _shader_tick_timer: ClockEvent = None
+
+    def key_press_from_framework(self, modifiers: str, key: str) -> bool:
+        """ dispatch key press event, coming normalized from the UI framework.
+
+        :param modifiers:       modifier keys.
+        :param key:             key character.
+        :return:                True if key got consumed/used else False.
+        """
+        try:
+            self.last_key = float(ord(key))
+        except (TypeError, ValueError, SyntaxError):
+            pass
+
+        self.e_field_pos = field_calc_key(self.e_field_pos, "sdfwer234", key)
+        self.i_field_pos = field_calc_key(self.i_field_pos, "jkluio789", key)
+
+        self.update_input_values()
+
+        return super().key_press_from_framework(modifiers, key)
 
     def on_app_start(self):
         """ ensure that the non-persistent app states are available before widget tree build. """
@@ -75,6 +112,9 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
         if not self.framework_app.app_states.get('file_chooser_initial_path', ""):
             self.change_app_state('file_chooser_initial_path', norm_path("{glsl}"))
+        self.e_field_pos = (0.0, 0.0)
+        self.i_field_pos = (0.0, 0.0)
+        self.last_key = 0.0
         self.last_touch = DefaultTouch("default_touch", 1, {"x": .5, "y": .5})
         self.mouse_pos = (0.0, 0.0)
         self.render_widget = self.framework_root.ids.render_widget
@@ -106,6 +146,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         render_widget: Widget = cast(Widget, self.render_widget)
         if render_widget.collide_point(*render_widget.to_widget(*pos)):
             self.mouse_pos: Tuple[float, ...] = tuple(map(float, pos))
+            self.update_input_values()
 
     def on_tool_box_toggle(self, _flow_key: str, _event_kwargs: EventKwargsType) -> bool:
         """ toggle between display and hide of tool box.
@@ -151,7 +192,19 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
                     return False
 
         glo_vars = globals().copy()     # contains main_app variable from module level
-        glo_vars.update(Clock=Clock, mouse=self.mouse_pos, touch=self.last_touch, Window=Window, _add_base_globals=True)
+        glo_vars.update(
+            Clock=Clock, Window=Window, _add_base_globals=True,
+            c=lambda: Clock.get_boottime(),
+            e=lambda: main_app.e_field_pos,
+            i=lambda: main_app.i_field_pos,
+            k=lambda: main_app.last_key,
+            L=lambda: tuple(map(float, main_app.last_touch)),
+            l=lambda: (float(main_app.last_touch[0] / Window.width), float(main_app.last_touch[1] / Window.height)),
+            M=lambda: tuple(map(float, main_app.mouse_pos)),
+            m=lambda: (float(main_app.mouse_pos[0] / Window.width), float(main_app.mouse_pos[1] / Window.height)),
+            s=lambda: main_app.sound_volume,
+            v=lambda: main_app.sound_volume,
+        )
         shader_args = self.get_var('render_shader_args')
         for arg_name in shader_args:
             arg_inp = getattr(self, 'shader_arg_' + arg_name, UNSET)
@@ -222,6 +275,20 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
             if idx >= 0:
                 arg_name = line[idx + 3:]
         return arg_name
+
+    def update_input_values(self):
+        """ display input values. """
+        wid: Widget = cast(Widget, self.render_widget)
+        self.framework_root.ids.input_values.text = \
+            f"Inputs:" \
+            f"  ex={self.e_field_pos[0]:.3f}  ey={self.e_field_pos[1]:.3f}" \
+            f"  ix={self.i_field_pos[0]:.3f}  iy={self.i_field_pos[1]:.3f}" \
+            f"  k={self.last_key:.0f}" \
+            f"  lx={self.last_touch.x / wid.width:.3f}  ly={self.last_touch.y / wid.height:.3f}" \
+            f"  Lx={self.last_touch.x:.0f}  Ly={self.last_touch.y:.0f}" \
+            f"  mx={self.mouse_pos[0] / wid.width:.3f}  my={self.mouse_pos[1] / wid.height:.3f}" \
+            f"  Mx={self.mouse_pos[0]:.0f}  My={self.mouse_pos[1]:.0f}" \
+            f"  c={Clock.get_boottime():.1f}"
 
     def _update_registered_renderers(self):
         """ update the running shaders buttons after add/delete of a running shader. """

@@ -1,8 +1,14 @@
-lambda: (Window.width - 69.0, Window.height - 69.0)
-lambda: (main_app.render_widget.width - 69.0, main_app.render_widget.height - 69.0)
-(69.0, 69.0)
+e
+i
+m
+M
+l
+L
+lambda: Window.width - 69.0, Window.height - 69.0
+lambda: main_app.render_widget.width - 69.0, main_app.render_widget.height - 69.0
+69.0, 69.0
 lambda: tuple(map(float, main_app.last_touch.pos))
 lambda: tuple(map(float, main_app.render_widget.center))
 lambda: tuple(map(float, main_app.mouse_pos))
-(float(touch.x), float(touch.y))
-(float(touch.x / Window.width), float(touch.y / Window.height))
+float(touch.x), float(touch.y)
+float(touch.x / Window.width), float(touch.y / Window.height)

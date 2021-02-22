@@ -41,7 +41,7 @@
         visible: True
         disabled: not self.visible
         size_hint_y: None
-        height: round(2.4 * app.app_states['font_size'] + shader_args.minimum_height) if self.visible else 0
+        height: round(3.9 * app.app_states['font_size'] + shader_args.minimum_height) if self.visible else 0
         orientation: 'vertical'
         padding: '6sp'
         spacing: '3sp'
@@ -56,6 +56,8 @@
             Line:
                 width: sp(0.9)
                 rounded_rectangle: self.x + 1, self.y + 1, self.width - 2, self.height - 2, sp(9)
+        ImageLabel:
+            id: input_values
         BoxLayout:
             spacing: '3sp'
             padding: '3sp'
@@ -90,7 +92,8 @@
 
 
 <RenderWidget@ImageLabel+ShadersMixin>
-    on_touch_down: if self.collide_point(*args[1].pos): app.main_app.last_touch = args[1]
+    on_touch_down:
+        if self.collide_point(*args[1].pos): app.main_app.last_touch = args[1]; app.main_app.update_input_values()
 
 
 <FileChooserButton@OptionalButton>

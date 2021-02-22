@@ -1,7 +1,14 @@
+lambda: e()[0]
+lambda: i()[0]
+lambda: m()[0]
+lambda: M()[0]
+lambda: l()[0]
+lambda: L()[0]
 lambda: main_app.sound_volume
 lambda: main_app.vibration_volume
 main_app.sound_volume
 main_app.vibration_volume
+t
 1.0
 0.9
 0.6
