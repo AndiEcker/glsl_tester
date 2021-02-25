@@ -1,6 +1,4 @@
 // kanatacrude - bit less seasickness from camera movement
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;
@@ -37,7 +35,7 @@ float map(vec3 p)
 void main( void ) {
   t = time * 0.1;//1.1;
   t2 = time * 0.3;
-  vec2 pos = ((gl_FragCoord.xy - pos)*2.0 - resolution.xy) / resolution.y;
+  vec2 pos = ((gl_FragCoord.xy - win_pos)*2.0 - resolution.xy) / resolution.y;
   vec3 camPos = vec3(cos(t2*0.3+t2), sin(t2*0.3-t2), 2.-sin(t2*.2)/2.);
   vec3 camTarget = vec3(0.0, 0.0, 0.0);
   vec3 camDir = normalize(camTarget-camPos);

@@ -1,6 +1,4 @@
 // By @paulofalcao
-$HEADER$
-
 uniform float alpha;
 uniform float contrast;
 uniform float tex_col_mix;

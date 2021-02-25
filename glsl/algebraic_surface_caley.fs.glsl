@@ -1,7 +1,5 @@
 // AlgebraicSurface_Caley: ray-marching algebraic surfaces with orthographic projection by 焦堂生 jiaotangsheng@126.com
 // Idea from RealSurf (http://realsurf.informatik.uni-halle.de/)
-$HEADER$
-
 uniform float alpha;
 uniform float contrast;
 uniform float tex_col_mix;
@@ -121,7 +119,7 @@ mat4 A = mat4( //polynomial interpolation for base points 0, 5, 10, 15 (better u
 );  //octave: inv(fliplr(vander([0,5,10,15])))'
 
 void main( void ) {
-  vec2 pos = ((gl_FragCoord.xy - pos) * 2.0 - resolution) / min(resolution.x, resolution.y)*4.;
+  vec2 pos = ((gl_FragCoord.xy - win_pos) * 2.0 - resolution) / min(resolution.x, resolution.y)*4.;
   //pos.y *= resolution.y/resolution.x;
   vec4 tex = texture2D(texture0, tex_coord0);
 

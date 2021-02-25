@@ -5,13 +5,12 @@ GlslTester - play with glsl shaders
 Write, compile and run glsl shader code on any platform supported by Kivy.
 """
 import os
-from typing import Tuple, cast
+from typing import List, Tuple, Union, cast
 
 # noinspection PyProtectedMember
 from kivy._clock import ClockEvent
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.input import MotionEvent
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
@@ -29,10 +28,15 @@ from ae.kivy_glsl import ShadersMixin, BUILT_IN_SHADERS
 from ae.kivy_sideloading import SideloadingMainAppMixin
 
 
-__version__ = '0.0.10'
+__version__ = '0.0.11'
 
 
-def field_calc_key(value: Tuple[float, float], matrix: str, key: str) -> Tuple[float, float]:
+HIST_TOUCH_MAX = 3
+
+PosValType = Tuple[float, float]
+
+
+def field_calc_key(value: PosValType, matrix: str, key: str) -> PosValType:
     """
     :param value:               current field value.
     :param matrix:              field char matrix.
@@ -47,17 +51,6 @@ def field_calc_key(value: Tuple[float, float], matrix: str, key: str) -> Tuple[f
     return value
 
 
-class DefaultTouch(MotionEvent):
-    """ default touch for to set main_app.last_touch on app startup. """
-    def depack(self, args):
-        """ pass init args to this touch event. """
-        self.is_touch = True
-        self.sx = args['x']
-        self.sy = args['y']
-        self.profile = ['pos']
-        super().depack(args)
-
-
 class ShaderArgInput(BoxLayout):
     """ layout containing label and text input for to edit the value of a shader argument. """
     arg_name = StringProperty()
@@ -70,17 +63,50 @@ class ShaderButton(FlowButton):
 
 class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
     """ main app class. """
-    e_field_pos: Tuple[float, float]        #: e-key input field
-    i_field_pos: Tuple[float, float]        #: i-key input field
+    e_field_pos: PosValType                 #: e-key input field
+    hist_touch: List[PosValType]            #: last touch history
+    i_field_pos: PosValType                 #: i-key input field
     last_key: float                         #: last key ord code
-    last_touch: MotionEvent                 #: last touch event: init=DefaultTouch(), update=RenderWidget.on_touch_down
-    mouse_pos: Tuple[float, float]          #: current mouse pointer position in the shader widget
+    last_touch: PosValType                  #: last touch event: init=DefaultTouch(), update=RenderWidget.on_touch_down
+    mouse_pos: PosValType                   #: current mouse pointer position in the shader widget
     next_shader: str                        #: non-persistent app state holding the code of the next shader to add
     render_frequency: float                 #: renderer tick timer frequency
     render_widget: ShadersMixin             #: widget for to display shader output
     shader_filename: str                    #: current shader filename app state
 
     _shader_tick_timer: ClockEvent = None
+
+    def input_callables(self):
+        """ return dict of all input callables for to feed shader args. """
+        ren_wid = cast(Widget, self.render_widget)
+
+        ica = dict(
+            c=lambda: Clock.get_boottime(),
+            e=lambda: main_app.e_field_pos,
+            i=lambda: main_app.i_field_pos,
+            K=lambda: main_app.last_key,
+            k=lambda: main_app.last_key / 255.0,
+            L=lambda: main_app.last_touch,
+            l=lambda: (main_app.last_touch[0] / ren_wid.width, main_app.last_touch[1] / ren_wid.height),
+            M=lambda: main_app.mouse_pos,
+            m=lambda: (main_app.mouse_pos[0] / ren_wid.width, main_app.mouse_pos[1] / ren_wid.height),
+            s=lambda: main_app.sound_volume,
+            v=lambda: main_app.vibration_volume,
+        )
+
+        hist_len = min(HIST_TOUCH_MAX, len(main_app.hist_touch))
+
+        def _bind_idx(_i):  # def-_i-bind to prevent that the last idx value of the range is used when the lambda runs
+            return lambda: main_app.hist_touch[_i]      # .. s.a. https://stackoverflow.com/questions/36805071
+        ica.update({'H' + str(idx + 1): _bind_idx(idx) for idx in range(hist_len)})
+        ica.update({'H_' + str(abs(idx)): _bind_idx(idx) for idx in range(-hist_len, 0)})
+
+        def _bind_idx_idx(_i):
+            return lambda: (main_app.hist_touch[_i][0] / ren_wid.width, main_app.hist_touch[_i][1] / ren_wid.height)
+        ica.update({'h' + str(idx + 1): _bind_idx_idx(idx) for idx in range(hist_len)})
+        ica.update({'h_' + str(abs(idx)): _bind_idx_idx(idx) for idx in range(-hist_len, 0)})
+
+        return ica
 
     def key_press_from_framework(self, modifiers: str, key: str) -> bool:
         """ dispatch key press event, coming normalized from the UI framework.
@@ -112,16 +138,21 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
         if not self.framework_app.app_states.get('file_chooser_initial_path', ""):
             self.change_app_state('file_chooser_initial_path', norm_path("{glsl}"))
-        self.e_field_pos = (0.0, 0.0)
-        self.i_field_pos = (0.0, 0.0)
-        self.last_key = 0.0
-        self.last_touch = DefaultTouch("default_touch", 1, {"x": .5, "y": .5})
-        self.mouse_pos = (0.0, 0.0)
+        ini_sca_val = 0.501
+        ini_pos_val = (ini_sca_val, ini_sca_val)
+        self.e_field_pos = ini_pos_val
+        self.hist_touch = list()
+        self.i_field_pos = ini_pos_val
+        self.last_key = ini_sca_val
+        self.last_touch = ini_pos_val
+        self.mouse_pos = ini_pos_val
         self.render_widget = self.framework_root.ids.render_widget
         self.update_shader_file()
 
         Window.bind(mouse_pos=self.on_mouse_pos)
         self.on_render_frequency()
+        self.update_input_values()
+        Clock.schedule_interval(lambda *_args: self.update_input_values, 0.99)  # to see c/time input running
 
     def on_file_chooser_submit(self, file_path: str, chooser_popup: Widget):
         """ event callback from FileChooserPopup.on_submit() on selection of the next shader file to be added.
@@ -143,9 +174,9 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
     def on_mouse_pos(self, _instance, pos):
         """ Window mouse position event handler. """
         self.vpo(f"GlslTesterApp.on_mouse_pos({_instance}, {pos})")
-        render_widget: Widget = cast(Widget, self.render_widget)
-        if render_widget.collide_point(*render_widget.to_widget(*pos)):
-            self.mouse_pos: Tuple[float, ...] = tuple(map(float, pos))
+        ren_wid: Widget = cast(Widget, self.render_widget)
+        if ren_wid.collide_point(*ren_wid.to_widget(*pos)):
+            self.mouse_pos: Tuple[float, ...] = tuple(map(float, pos))      # real type: PosValType
             self.update_input_values()
 
     def on_tool_box_toggle(self, _flow_key: str, _event_kwargs: EventKwargsType) -> bool:
@@ -192,21 +223,10 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
                     return False
 
         glo_vars = globals().copy()     # contains main_app variable from module level
-        glo_vars.update(
-            Clock=Clock, Window=Window, _add_base_globals=True,
-            c=lambda: Clock.get_boottime(),
-            e=lambda: main_app.e_field_pos,
-            i=lambda: main_app.i_field_pos,
-            k=lambda: main_app.last_key,
-            L=lambda: tuple(map(float, main_app.last_touch)),
-            l=lambda: (float(main_app.last_touch[0] / Window.width), float(main_app.last_touch[1] / Window.height)),
-            M=lambda: tuple(map(float, main_app.mouse_pos)),
-            m=lambda: (float(main_app.mouse_pos[0] / Window.width), float(main_app.mouse_pos[1] / Window.height)),
-            s=lambda: main_app.sound_volume,
-            v=lambda: main_app.sound_volume,
-        )
-        shader_args = self.get_var('render_shader_args')
-        for arg_name in shader_args:
+        glo_vars.update(Clock=Clock, Window=Window, _add_base_globals=True)
+        glo_vars.update(self.input_callables())
+
+        for arg_name in self.shader_arg_names():
             arg_inp = getattr(self, 'shader_arg_' + arg_name, UNSET)
             if arg_inp is UNSET:
                 self.show_message(get_txt("missing 'shader_arg_{arg_name}' app state"), title=title)
@@ -267,7 +287,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         :param arg_name:        shader arg name.
         :return:                alias (if found) or shader arg name (if not).
         """
-        next_shader = self.framework_app.app_states['next_shader']
+        next_shader = self.next_shader
         idx = next_shader.find(" " + arg_name + ";")
         if idx >= 0:
             line = next_shader[idx + len(arg_name) + 2:next_shader.find("\n", idx)]
@@ -276,19 +296,28 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
                 arg_name = line[idx + 3:]
         return arg_name
 
+    def shader_arg_names(self, *_args):
+        """ shader arg names of the shader code in the loaded shader file.
+
+        :param _args:           unused here - but needed in kv for to bind expression to kivy property
+        :return:                tuple of shader arg names of the currently loaded shader code, plus the
+                                `start_time` argument which controls, independent from to be included in the shader
+                                code, how the `time` argument get prepared/corrected in each render frame (see also
+                                :paramref:`ae.kivy_glsl.ShadersMixin.add_shader.start_time` and i18n help texts).
+        """
+        return (arg_name for arg_name in self.get_var('render_shader_args')
+                if arg_name == 'start_time' or " " + arg_name + ";" in self.next_shader)
+
     def update_input_values(self):
         """ display input values. """
-        wid: Widget = cast(Widget, self.render_widget)
-        self.framework_root.ids.input_values.text = \
-            f"Inputs:" \
-            f"  ex={self.e_field_pos[0]:.3f}  ey={self.e_field_pos[1]:.3f}" \
-            f"  ix={self.i_field_pos[0]:.3f}  iy={self.i_field_pos[1]:.3f}" \
-            f"  k={self.last_key:.0f}" \
-            f"  lx={self.last_touch.x / wid.width:.3f}  ly={self.last_touch.y / wid.height:.3f}" \
-            f"  Lx={self.last_touch.x:.0f}  Ly={self.last_touch.y:.0f}" \
-            f"  mx={self.mouse_pos[0] / wid.width:.3f}  my={self.mouse_pos[1] / wid.height:.3f}" \
-            f"  Mx={self.mouse_pos[0]:.0f}  My={self.mouse_pos[1]:.0f}" \
-            f"  c={Clock.get_boottime():.1f}"
+        def _v_f(k_: str, val: Union[float, Tuple[float, ...]]) -> str:
+            if isinstance(val, float):
+                dig = 3 if k_.islower() else 0
+                return f"{val:.{dig}f}"
+            return ",".join(_v_f(k_, v_) for v_ in val)
+
+        ica = self.input_callables()
+        self.framework_root.ids.input_values.text = "  ".join(k + "=" + _v_f(k, v()) for k, v in ica.items())
 
     def _update_registered_renderers(self):
         """ update the running shaders buttons after add/delete of a running shader. """

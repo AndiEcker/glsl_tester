@@ -1,6 +1,4 @@
 // Simple Mandelbulb - by @SyntopiaDK (The camera code and lightning was taken from an example by @mrdoob)
-$HEADER$
-
 uniform float alpha;
 uniform float contrast;
 uniform float tex_col_mix;

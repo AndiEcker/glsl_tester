@@ -2,8 +2,6 @@
 // License CC0: Slicing a 4D apollian
 // Was experimenting with slicing 3D fractals in 2D. Naturally I wondered how it looks if we +1 dimension
 // Based upon: https://www.shadertoy.com/view/4ds3zn
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;
@@ -111,7 +109,7 @@ vec3 post(vec3 col, vec2 q) {
 }
 
 void main(void) {
-  vec2 q = (gl_FragCoord.xy - pos) / resolution.xy;
+  vec2 q = (gl_FragCoord.xy - win_pos) / resolution.xy;
   vec2 uv = -1.0 + 2.0*q;
   uv.y += 0.225;
   uv.x*=resolution.x/resolution.y;

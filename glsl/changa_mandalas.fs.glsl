@@ -1,6 +1,4 @@
 // Original shader from: https://www.shadertoy.com/view/tsdfWf
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;

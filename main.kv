@@ -41,7 +41,9 @@
         visible: True
         disabled: not self.visible
         size_hint_y: None
-        height: round(3.9 * app.app_states['font_size'] + shader_args.minimum_height) if self.visible else 0
+        height:
+            round(2.4 * app.app_states['font_size'] + input_values.height + shader_args.minimum_height) \
+            if self.visible else 0
         orientation: 'vertical'
         padding: '6sp'
         spacing: '3sp'
@@ -56,8 +58,6 @@
             Line:
                 width: sp(0.9)
                 rounded_rectangle: self.x + 1, self.y + 1, self.width - 2, self.height - 2, sp(9)
-        ImageLabel:
-            id: input_values
         BoxLayout:
             spacing: '3sp'
             padding: '3sp'
@@ -86,6 +86,11 @@
                 relief_square_inner_lines: int(self.height / 3.9)
         ShaderArgs:
             id: shader_args
+        ImageLabel:
+            id: input_values
+            size_hint_y: None
+            text_size: self.width, None
+            height: self.texture_size[1] or self.height     # or ..height needed for initial redraw (buggy if multiline)
     RenderWidget:
         id: render_widget
         size_hint_y: 1
@@ -93,7 +98,10 @@
 
 <RenderWidget@ImageLabel+ShadersMixin>
     on_touch_down:
-        if self.collide_point(*args[1].pos): app.main_app.last_touch = args[1]; app.main_app.update_input_values()
+        if self.collide_point(*args[1].pos): \
+        app.main_app.hist_touch.append(app.main_app.last_touch); \
+        app.main_app.last_touch = (float(args[1].x), float(args[1].y)); \
+        app.main_app.update_input_values()
 
 
 <FileChooserButton@OptionalButton>
@@ -153,8 +161,7 @@
     padding: '6sp'
     cols: max(1, int(Window.width / (21 * app.main_app.font_size)))
     child_data_maps:
-        [dict(cls='ShaderArgInput', kwargs=dict(arg_name=arg)) for arg in app.main_app.get_var('render_shader_args') \
-        if arg == 'start_time' or " " + arg + ";" in app.app_states['next_shader']]
+        [dict(cls='ShaderArgInput', kwargs=dict(arg_name=arg)) for arg in app.main_app.shader_arg_names(app.app_states)]
 
 
 <UserPreferencesPopup>:

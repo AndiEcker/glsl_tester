@@ -1,5 +1,3 @@
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;
@@ -10,6 +8,13 @@ uniform vec4 tint_ink;
 #define EPS 0.001
 #define rot(a) mat2(cos(a),-sin(a),sin(a),cos(a))
 
+mat2 rotate2d (float angle)    // create 2d rotation matrix
+{
+ float ca = cos(angle);
+ float sa = sin(angle);
+ return mat2(ca, -sa, sa, ca);
+}
+
 float sdSphere(vec3 p, float r) {
  return length(p) - r;
 }
@@ -18,9 +23,9 @@ float map(vec3 p) {
  float r = 8.0;
  float d = sdSphere(p, r);
  for (int i = 0; i < 3; i++) {
-  p.xy *= rot(time * 0.2);
-  p.yz *= rot(time * 0.1);
-  p.zx *= rot(time * 0.3);
+  p.xy *= rotate2d(time * 0.2);
+  p.yz *= rotate2d(time * 0.1);
+  p.zx *= rotate2d(time * 0.3);
   p = abs(p) - r;
   r /= 3.0;
   d = min(d, sdSphere(p, r));

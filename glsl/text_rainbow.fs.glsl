@@ -1,7 +1,5 @@
 // Original shader from: https://www.shadertoy.com/view/3lKyzW
 // Fork of "cosmos font smooth" by netgrind. https://shadertoy.com/view/Xdjfzw 2021-01-14 00:00:36
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;

@@ -6,8 +6,6 @@
 // Mandelbulb and Mandelbox are ESCAPE-TIME FRACTALS: we iterate a function for each point in space, and follow the
 // orbit to see whether the sequence of points diverge for a maximum number of iterations, or whether the sequence stays
 // inside a fixed escape radius.
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;
@@ -48,7 +46,6 @@ float mandelbulb(vec3 pos) {
     float theta = acos(pos.y/r1) ;//Try Power 2. and 3.
     float phi = atan(pos.x, pos.z);
     */
-	    
     // Distance estimator?
     d1 = pow(r1,Power-1.15)*Power*d1 ;//+ sin(t1);
     // 🌟🌟 Scale and rotate the point
@@ -94,7 +91,7 @@ Raymarching technique - Distance Estimation
 void main( void ){
   //float t1 = time * 1.0; //1.1;
   //float t2 = time * 0.4;
-  vec2 pos = ((gl_FragCoord.xy - pos)*2.0 - resolution.xy) / resolution.y;
+  vec2 pos = ((gl_FragCoord.xy - win_pos)*2.0 - resolution.xy) / resolution.y;
   //Stop Camera rotation here
   vec3 camPos = vec3(3.,3.,2.5);//Use +abs(sin(t1))*28. to test
   //vec3 camPos = vec3(cos(t2*0.3+t2), sin(t2*0.3-t2), 2.-sin(t2*.2)/2.);

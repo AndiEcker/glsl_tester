@@ -2,8 +2,6 @@
 // Code by Flopine / Thanks to wsmind, leon, XT95, lsdlive, lamogui, Coyhot, Alkama,YX, NuSan and slerpy for teaching me
 // Thanks LJ for giving me the spark :3, Thanks to the Cookie Collective, which build a cozy and safe environment for me
 // and other to sprout :)  https://twitter.com/CookieDemoparty
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;

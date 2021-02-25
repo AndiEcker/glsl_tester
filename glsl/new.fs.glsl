@@ -1,5 +1,3 @@
-$HEADER$
-
 uniform float alpha;
 uniform float contrast;         // red
 uniform float tex_col_mix;      // relabeled

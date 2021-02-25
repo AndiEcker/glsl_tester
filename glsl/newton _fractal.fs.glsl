@@ -6,8 +6,6 @@
 // v4 rotate2d(angle), z4next(z) and z5next added 
 //    
 // What about to go 3D like http://www.josleys.com/show_gallery.php?galid=338 ?
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;
@@ -72,16 +70,15 @@ vec2 z5next(vec2 z)
  return z - div(vec2(1.0,0.0)+z5, 5.0*z4);
 }
 
-//--- please select function ---
-//#define zFunc(z) z = z3next(z)
-//#define zFunc(z) z = z4next(z)
-#define zFunc(z) z = z5next(z)
 
 vec2 newtonFractal(vec2 z)
 {
  for (int n=0; n<1000; n++) {
   vec2 old = z;
-  zFunc(z);
+  //--- please select function ---
+  //z = z3next(z);
+  //z = z4next(z);
+  z = z5next(z);
   float d = length(z - old);
   if (d < 0.01) {
    float u = float(n) + log2(log(0.01) / log(d));

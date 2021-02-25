@@ -1,6 +1,4 @@
 // Original shader from: https://www.shadertoy.com/view/tl3BRr
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;
@@ -8,8 +6,6 @@ uniform vec2 resolution;
 uniform vec2 win_pos;
 
 // Emulate some GLSL ES 3.x
-#define round(x) (floor((x) + 0.5))
-
 #define TWOPI 6.28318530718
 #define T_SPEED 0.2
 #define FIREWORK_SCALE 15.
@@ -152,7 +148,7 @@ void main(void) {
     vec3 cBase = hsv2rgb(vec3(h, s, tRamp));
     float sizeBase = 0.2 + 0.8 * rand2.y;
     float rAddOn = float(idx == 3) * rand2.z * 2.;
-    float nPetalsFinal = firework.nPetals + float(firework.nPetals > 0.) * round(3. * rand2.z);
+    float nPetalsFinal = firework.nPetals + float(firework.nPetals > 0.0) * round(3.0 * rand2.z);
     for (float i = 0.; i < NUM_PARTICLES; i++) {
       float size = sizeBase * mix(1., tRamp * (1.5 + 1.5 * sin(t * i)), firework.sparkleScale);
       vec2 dir = RandDirection(i + fract(0.17835497 * tCycle), firework.rMin, firework.rMax + RING_STEP*rAddOn,

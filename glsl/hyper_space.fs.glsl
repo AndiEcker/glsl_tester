@@ -1,5 +1,3 @@
-$HEADER$
-
 uniform float alpha;
 uniform float contrast;
 uniform float tex_col_mix;
@@ -25,9 +23,8 @@ float sceneSDF(vec3 pos) {
 
 vec3 sceneNormal(vec3 pos) {
   vec3 eps = vec3(EPS, 0, 0) / 16.0;
-	
   return normalize(vec3(sceneSDF(pos + eps.xyy) - sceneSDF(pos - eps.xyy),
-		                sceneSDF(pos + eps.yxy) - sceneSDF(pos - eps.yxy),
+                        sceneSDF(pos + eps.yxy) - sceneSDF(pos - eps.yxy),
                         sceneSDF(pos + eps.yyx) - sceneSDF(pos - eps.yyx)));
 }
 
@@ -47,7 +44,7 @@ vec3 loop(vec3 p) {
  p -= vec3(l / 2.0);
  return p;
 }
-	
+
 Ray fixRay(Ray n) {
  n.pos = loop(n.pos);
  n.dir = normalize(n.dir);
@@ -87,7 +84,7 @@ Ray updateRay(Ray r) {
 }
 
 void main( void ) {
- vec2 position = 2.0 * ((gl_FragCoord.xy - pos) / resolution.xy - 0.5);
+ vec2 position = 2.0 * ((gl_FragCoord.xy - win_pos) / resolution.xy - 0.5);
  position.x *= resolution.x / resolution.y;
  Ray r = getRay(position);
  for(int i = 0; i < MAX_STEPS; ++i) {

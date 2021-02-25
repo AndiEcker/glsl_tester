@@ -1,6 +1,4 @@
 // Original shader from: https://www.shadertoy.com/view/wdVBWd, https://twitter.com/gam0022/status/1339584625929175042
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;

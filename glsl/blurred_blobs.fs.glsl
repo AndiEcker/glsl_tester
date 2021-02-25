@@ -1,6 +1,4 @@
 // Blobs By @paulofalcao
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;

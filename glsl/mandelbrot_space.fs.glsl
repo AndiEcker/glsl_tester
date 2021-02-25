@@ -1,7 +1,5 @@
 // Original shader from: https://www.shadertoy.com/view/Wl3fzM
 // License CC0: Apollian with a twist - Playing around with apollian fractal
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;
@@ -16,9 +14,6 @@ float tanh(float x) {
 
 #define PI              3.141592654
 #define TAU             (2.0*PI)
-#define L2(x)           dot(x, x)
-#define ROT(a)          mat2(cos(a), sin(a), -sin(a), cos(a))
-#define PSIN(x)         (0.5+0.5*sin(x))
 
 vec3 hsv2rgb(vec3 c) {
   const vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -41,14 +36,18 @@ float apollian(vec4 p, float s) {
 
 float weird(vec2 p) {
   float z = 4.0;
-  p *= ROT(time*0.1);
-  float tm = 0.2*time;
-  float r = 0.5;
-  vec4 off = vec4(r*PSIN(tm*sqrt(3.0)), r*PSIN(tm*sqrt(1.5)), r*PSIN(tm*sqrt(2.0)), 0.0);
+  float tm = 0.1*time;
+  p *= mat2(cos(tm), sin(tm), -sin(tm), cos(tm));
+  tm = 0.2*time;
+  vec4 off = vec4(0.5*(0.5 + 0.5*sin(tm*sqrt(3.0))),
+                  0.5*(0.5 + 0.5*sin(tm*sqrt(1.5))),
+                  0.5*(0.5 + 0.5*sin(tm*sqrt(2.0))),
+                  0.0);
   vec4 pp = vec4(p.x, p.y, 0.0, 0.0)+off;
   pp.w = 0.125*(1.0-tanh(length(pp.xyz)));
-  pp.yz *= ROT(tm);
-  pp.xz *= ROT(tm*sqrt(0.5));
+  pp.yz *= mat2(cos(tm), sin(tm), -sin(tm), cos(tm));
+  tm = tm*sqrt(0.5);
+  pp.xz *= mat2(cos(tm), sin(tm), -sin(tm), cos(tm));
   pp /= z;
   float d = apollian(pp, 1.2);
   return d*z;
@@ -87,8 +86,8 @@ vec3 color(vec2 p) {
   vec3 bp   = ro + bt*rd;
   vec3 srd1 = normalize(lp1-bp);
   vec3 srd2 = normalize(lp2-bp);
-  float bl21= L2(lp1-bp);
-  float bl22= L2(lp2-bp);
+  float bl21= dot(lp1-bp, lp1-bp);
+  float bl22= dot(lp2-bp, lp2-bp);
 
   float st1= (0.0-b)/srd1.y;
   float st2= (0.0-b)/srd2.y;

@@ -2,8 +2,6 @@
 // Created by inigo quilez - iq/2013
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 // More info here:  http://www.iquilezles.org/www/articles/lyapunovfractals/lyapunovfractals.htm
-$HEADER$
-
 uniform float alpha;
 uniform float tex_col_mix;
 uniform float time;
