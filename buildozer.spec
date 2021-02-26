@@ -4,7 +4,7 @@
 title = GlslTester
 
 # (str) Package name
-package.name = glsltester
+package.name = glsl_tester
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.test
@@ -45,8 +45,8 @@ version.filename = %(source.dir)s/main.py
 requirements = android, hostpython3==3.7.5, python3==3.7.5, kivy==2.0.0, plyer, qrcode, kivy_garden.qrcode,
     ae.base, ae.files, ae.paths, ae.deep, ae.droid, ae.inspector, ae.i18n, ae.updater, ae.core, ae.literal, ae.console,
     ae.parse_date, ae.gui_app, ae.gui_help, ae.kivy_auto_width, ae.kivy_dyn_chi, ae.kivy_help, ae.kivy_relief_canvas,
-    ae.kivy_app, ae.kivy_user_prefs, ae.kivy_glsl, ae.kivy_file_chooser,
-    ae.sideloading_server, ae.kivy_sideloading, ae.kivy_iterable_displayer, ae.kivy_qr_displayer
+    ae.kivy_app, ae.kivy_user_prefs, ae.kivy_glsl,
+    ae.sideloading_server, ae.kivy_sideloading, ae.kivy_file_chooser, ae.kivy_iterable_displayer, ae.kivy_qr_displayer
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -100,7 +100,7 @@ fullscreen = 0
 
 # (list) Permissions
 #android.permissions = INTERNET
-android.permissions = CAMERA, INTERNET, VIBRATE, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, WAKE_LOCK
+android.permissions = INTERNET, VIBRATE, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, WAKE_LOCK
 
 # (int) Target Android API, should be as high as possible.
 #android.api = 27

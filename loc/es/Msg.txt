@@ -53,22 +53,18 @@ fichero de shader.""",
 puntea para detener
 el shader arrancado.""",
 "help_flow#shader_arg_alpha": """\
-introducir un valor de
-punto flotante entre
-0.0 y 1.0 para el
-argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.
+introducir un valor de punto flotante entre
+0.0 y 1.0 para el argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.
 
-Este número esta
-interpretado por la
-mayoria de los shaders
-como opacidad.
+Este número esta interpretado por la
+mayoria de los shaders como opacidad.
 
-Para ajustar ese valor
-dinamicamente por un
-shader arrancado, introduce
-lo como una expressión
-lambda, como por ejemplo
-'lambda: main_app.sound_volume'.""",
+Para ajustar ese valor dinamicamente por un
+shader arrancado, introduce lo como una
+expressión lambda, como por ejemplo
+'lambda: main_app.sound_volume' o 's' para
+usar el deslizador del volumen ('v' para
+aquel de la intensidad de vibración).""",
 "help_flow#shader_arg_center_pos": """\
 introduzca una lista dos valores de
 punto flotante o una expressión de lambda
@@ -91,10 +87,13 @@ punto flotante o una expressión de lambda
 para especificar el argumento
 {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.""",
 "help_flow#shader_arg_start_time": """\
-introduzca un valor de punto flotante o
-una expresión lambda para especificar
-el argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
-del shader.""",
+introduzca un valor de punto flotante o una
+expresión lambda para especificar el argumento
+{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} del shader.
+
+introduzca '0.0' para sincronizar los shaders,
+'None' para tener un tiempo propio o 'c' para
+detener el temporizador para este shader.""",
 "help_flow#shader_arg_tex_col_mix": """\
 introduzca un valor de punto flotante o
 una expresión lambda para especificar

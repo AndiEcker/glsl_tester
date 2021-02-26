@@ -53,29 +53,26 @@ datei auszuwählen.""",
 tippe um diesen laufenden
 shader zu entfernen.""",
 "help_flow#shader_arg_alpha": """\
-gebe einen numerischen wert zwischen
-'0.0' and '1.0' für das {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
-shader argument ein.
-
-Dieser eingegebene wert beeinflusst
+gebe einen numerischen wert zwischen '0.0'
+und '1.0' für das {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+shader argument ein. Dieser wert beeinflusst
 die transparenz der shader-ausgabe.
 
-Um diesen wert beim start eines
-shaders zu setzen kann einer der
-schieberegler im zahnrad-menü
-verwendet werden.
-'main_app.sound_volume' repräsentiert
-z.B. den lautstärke-regler (und
-'main_app.vibration_volume' die
-vibrations-intensität).
+Um diesen wert beim start eines shaders zu
+setzen kann einer der schieberegler im
+zahnrad-menü verwendet werden: der wert des
+lautstärke-regler entspricht z.B. dem
+ausdruck 'main_app.sound_volume', und
+'main_app.vibration_volume' entspricht der
+aktuellen vibrations-intensität.
 
 Mit der zeichenkette 'lambda: ' am
 anfang kann der wert auch im laufenden
 shader dynamisch geändert werden. Die
 eingabe 'lambda: main_app.sound_volume'
-macht z.B. den lautstärke-regler
-des zahnrad-menüs zu einem
-dynamischen regler dieses wertes.""",
+oder kurz 's' macht z.B. den lautstärke-
+regler zum dynamischen shader-eingabe-wert
+(die vibrations-intensität via 'v').""",
 "help_flow#shader_arg_center_pos": """\
 gebe zwei komma-werte (z.B. '100.0, 200.0')
 oder einen lambda-ausdruck für das
@@ -118,7 +115,10 @@ synchronisiert.
 
 Bei eingabe von 'None'
 startet der shader-
-zeitgeber bei null.""",
+zeitgeber bei null.
+
+'c' repräsentiert den wert
+des laufenden zeitgebers.""",
 "help_flow#shader_arg_tex_col_mix": """\
 gebe einen komma-wert oder
 einen lambda-ausdruck für

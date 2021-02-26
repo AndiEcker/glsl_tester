@@ -1,5 +1,6 @@
-#: import _u_ ae.kivy_user_prefs
 #: import read_file_text ae.files.read_file_text
+# already imported via ae.kivy_sideloading/kv-string: #: import _f_ ae.kivy_file_chooser
+#: import _u_ ae.kivy_user_prefs
 <Main@BoxLayout>
     orientation: 'vertical'
     BoxLayout:
@@ -88,9 +89,12 @@
             id: shader_args
         ImageLabel:
             id: input_values
-            size_hint_y: None
+            font_size: app.app_states['font_size'] * 0.9
+            size_hint: 1 if tool_box.visible else None, None
+            opacity: 1 if tool_box.visible else 0
             text_size: self.width, None
-            height: self.texture_size[1] or self.height     # or ..height needed for initial redraw (buggy if multiline)
+            # or ..height needed for initial redraw (else height is wrong for multiline label text)
+            size: self.width if tool_box.visible else 0, self.texture_size[1] or self.height if tool_box.visible else 0
     RenderWidget:
         id: render_widget
         size_hint_y: 1
@@ -141,8 +145,9 @@
     height: app.main_app.font_size * 1.8 if root.parent and root.parent.parent.visible else 0.0
     visible: bool(root.parent and root.parent.parent.visible)
     ImageLabel:
+        font_size: app.app_states['font_size'] * 0.69
         # strange: text is visible in dark mode (even with color.alpha==0), therefore had to set it to empty string
-        text: _(app.main_app.shader_arg_alias(root.arg_name)) + ":" if root.visible else ""
+        text: _(app.main_app.shader_arg_alias(root.arg_name)) + ":" if root.visible else ""     # alt: opacity = 0
         text_size: self.width, None
         halign: 'right'
         size_hint_x: 0.39
@@ -159,7 +164,7 @@
 <ShaderArgs@DynamicChildrenBehavior+GridLayout>
     spacing: '9sp'
     padding: '6sp'
-    cols: max(1, int(Window.width / (21 * app.main_app.font_size)))
+    cols: max(1, int(Window.width / (15 * app.main_app.font_size)))
     child_data_maps:
         [dict(cls='ShaderArgInput', kwargs=dict(arg_name=arg)) for arg in app.main_app.shader_arg_names(app.app_states)]
 

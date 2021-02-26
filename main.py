@@ -28,7 +28,7 @@ from ae.kivy_glsl import ShadersMixin, BUILT_IN_SHADERS
 from ae.kivy_sideloading import SideloadingMainAppMixin
 
 
-__version__ = '0.0.11'
+__version__ = '0.1.15'
 
 
 HIST_TOUCH_MAX = 3
@@ -152,7 +152,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         Window.bind(mouse_pos=self.on_mouse_pos)
         self.on_render_frequency()
         self.update_input_values()
-        Clock.schedule_interval(lambda *_args: self.update_input_values, 0.99)  # to see c/time input running
+        Clock.schedule_interval(lambda *_args: self.update_input_values(), 0.999999)
 
     def on_file_chooser_submit(self, file_path: str, chooser_popup: Widget):
         """ event callback from FileChooserPopup.on_submit() on selection of the next shader file to be added.
@@ -173,9 +173,9 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
     def on_mouse_pos(self, _instance, pos):
         """ Window mouse position event handler. """
-        self.vpo(f"GlslTesterApp.on_mouse_pos({_instance}, {pos})")
         ren_wid: Widget = cast(Widget, self.render_widget)
         if ren_wid.collide_point(*ren_wid.to_widget(*pos)):
+            self.vpo(f"GlslTesterApp.on_mouse_pos({_instance}, {pos})")
             self.mouse_pos: Tuple[float, ...] = tuple(map(float, pos))      # real type: PosValType
             self.update_input_values()
 
@@ -317,7 +317,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
             return ",".join(_v_f(k_, v_) for v_ in val)
 
         ica = self.input_callables()
-        self.framework_root.ids.input_values.text = "  ".join(k + "=" + _v_f(k, v()) for k, v in ica.items())
+        self.framework_root.ids.input_values.text = "   ".join(k + "=" + _v_f(k, v()) for k, v in ica.items())
 
     def _update_registered_renderers(self):
         """ update the running shaders buttons after add/delete of a running shader. """
@@ -338,7 +338,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
 
 if __name__ == '__main__':
-    main_app = GlslTesterApp(app_name='glsltester', multi_threading=True)
+    main_app = GlslTesterApp(app_name='glsl_tester', multi_threading=True)
 
     PATH_PLACEHOLDERS['glsl'] = scripts_path = os.path.join(norm_path("{ado}"), "glsl")
     check_moves("glsl", scripts_path)
