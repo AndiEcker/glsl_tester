@@ -1,6 +1,5 @@
 kivy
-ae_kivy_glsl
-ae_kivy_app
+ae_kivy_app                     # importing ae_kivy_glsl
 ae_kivy_file_chooser            # hidden python dependency via kivy_sideloading/kv-string
 ae_kivy_iterable_displayer      # hidden python dependency via kivy_sideloading/kv-string
 ae_kivy_qr_displayer            # hidden python dependency via kivy_sideloading/kv-string
