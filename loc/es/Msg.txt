@@ -4,57 +4,66 @@
 "help_app_state#sound_volume": """\
 volumen de sonidos
 
-para silenciar todos los sonidos puntea
-a la izquierda.
+para silenciar los sonidos puntea a la izquierda.
 
 volumen actual: {round(self.value * 100)}%
 
-Usar la expression
-'lambda: main_app.sound_volume'
-para cambiar valores del shader.""",
+usa la expression 'lambda: main_app.sound_volume'
+(o 's') para cambiar un argumento del shader
+dinamicamente.""",
 #----------------------------------
 #---- OVERWRITING ae.gui_help -----
 "help_app_state#vibration_volume": """\
 intensidad vibración
 
-para silenciar todos los
-vibraciones puntea a la
-izquierda.
+para silenciar los vibraciones puntea a la izquierda.
 
 vibración actual: {round(self.value * 100)}%
 
-usa la expression
-'lambda: main_app.vibration_volume'
-para cambiar valores del shader.""",
-#----------------------------------
-#---- OVERWRITING ae.gui_help -----
+usa la expression 'lambda: main_app.vibration_volume'
+para cambiar un argumento de un shader dinamicamente.""",
+#==================================
 "help_app_state#render_frequency": """\
 ajustar la frequencia de la animación
 del shader.
 
 current frequency: {round(self.value)}Hz
 
-moviendolo hacia la izquierda la
+moviendolo hacia la izquierda, la
 animación automatica se desactivará
-y aparecerá un botón 'tick' para
+y aparecerá un botón [b]tick[/b] para
 avanzar la animación de forma
 manualmente.""",
 #==================================
 "help_flow#add_shader": """\
-puntea ese botón para
-arrancar un nueva
-instancia del shader
-cargado.""",
-"help_flow#open_file_chooser:shader_filename": """\
-puntea para abrir
-y cargar un nuevo
-fichero de shader.""",
+añadir un nueva instancia
+del shader número [b]{main_app.shaders_idx}[/b].""",
+#----------------------------------
 "help_flow#del_shader": """\
-puntea para detener
-el shader arrancado.""",
+eliminar el shader [b]{main_app.shaders_idx}[/b],
+seleccionado para editar.""",
+#----------------------------------
+"help_flow#open_file_chooser:shader_filename": """\
+seleccionar un nuevo fichero
+para el shader [b]{main_app.shaders_idx}[/b].""",
+#----------------------------------
+"help_flow#run_shader": """\
+{"detener" if main_app.shaders_args[main_app.shaders_idx]['run_state'] == 'running' else "arrancar"}
+shader [b]{main_app.shaders_idx}[/b].""",
+#----------------------------------
+"help_flow#sel_shader": """\
+selecciona el shader [b]{self.text.split('==')[0]}[/b]
+para editar.
+
+el botón del shader
+seleccionado para editar
+se muestra de doble ancho.{'''
+(este shader ya esta
+seleccionado)''' if main_app.shaders_idx == int(self.text.split('==')[0]) else ""}""",
+#----------------------------------
 "help_flow#shader_arg_alpha": """\
 introducir un valor de punto flotante entre
-0.0 y 1.0 para el argumento {main_app.get_txt_(self.alias_name)}.
+0.0 y 1.0 para el argumento [b]{main_app.get_txt_(self.alias_name)}[/b].
 
 este número esta interpretado por la
 mayoria de los shaders como opacidad.
@@ -65,67 +74,72 @@ expressión lambda, como por ejemplo
 'lambda: main_app.sound_volume' o 's' para
 usar el deslizador del volumen ('v' para
 aquel de la intensidad de vibración).""",
+#----------------------------------
 "help_flow#shader_arg_center_pos": """\
-introduzca una lista dos valores de
-punto flotante o una expressión de lambda
-para especificar el argumento {main_app.get_txt_(self.alias_name)}.
+introduzca dos valores de punto flotante
+o una expressión de lambda para especificar
+el argumento [b]{main_app.get_txt_(self.alias_name)}[/b].
 
 la mayoria de los shaders usa este valor
 como posición central (x,y) de la animación.
 
 también se puede usar por ejemplo la
-expresión 'main_app.last_touch.pos'.
-""",
+expresión 'main_app.last_touch' or 'L'.""",
+#----------------------------------
 "help_flow#shader_arg_contrast": """\
 introduzca un valor de punto flotante o
 una expresión lambda para especificar
-el argumento {main_app.get_txt_(self.alias_name)}
+el argumento [b]{main_app.get_txt_(self.alias_name)}[/b]
 del shader.""",
+#----------------------------------
 "help_flow#shader_arg_mouse": """\
 introduzca una lista dos valores de
 punto flotante o una expressión de lambda
 para especificar el argumento
-{main_app.get_txt_(self.alias_name)}.""",
+[b]{main_app.get_txt_(self.alias_name)}[/b].""",
+#----------------------------------
 "help_flow#shader_arg_start_time": """\
 introduzca un valor de punto flotante o una
 expresión lambda para especificar el argumento
-{main_app.get_txt_(self.alias_name)} del shader.
+[b]{main_app.get_txt_(self.alias_name)}[/b] del shader.
 
 introduzca '0.0' para sincronizar los shaders,
-'None' para tener un tiempo propio o 'c' para
-detener el temporizador para este shader.""",
+o un lambda e.g. con 'c()' para cambiar la
+velocidad de la animación del shader.""",
+#----------------------------------
 "help_flow#shader_arg_tex_col_mix": """\
 introduzca un valor de punto flotante o
 una expresión lambda para especificar
-el argumento {main_app.get_txt_(self.alias_name)}
+el argumento [b]{main_app.get_txt_(self.alias_name)}[/b]
 del shader.""",
+#----------------------------------
 "help_flow#shader_arg_tint_ink": """\
-introduzca una lista cuatro valores de
-punto flotante o una expressión de lambda
-para especificar el argumento
-{main_app.get_txt_(self.alias_name)}.
+introduzca cuatro valores de punto flotante
+o una expressión de lambda para especificar
+el argumento [b]{main_app.get_txt_(self.alias_name)}[/b].
 
 usa una de los color del menu de los
-preferencias de usuario, por ejemplo
-el Color 1 en una expresión de lambda
-como 'lambda: main_app.flow_id_ink'.
+preferencias de usuario, por ejemplo el
+Color 1 en una expresión de lambda como
+'lambda: main_app.flow_id_ink'.
 
-el Color 2 es representado como
-'flow_path_ink',
+el Color 2 es representado por 'flow_path_ink',
 el Color 3 como 'selected_item_ink' y
 el Color 4 como 'unselected_item_ink'.""",
+#----------------------------------
 "help_flow#shader_filename": """\
 introduzca la ruta del fichero del
 shader que quieres arrancar o puntea
-el botón ... a la derecha para
+el botón [b]...[/b] a la izquierda para
 seleccionarlo.""",
+#----------------------------------
 "help_flow#next_render_tick": """\
 puntea para avanzar la animación
-del shader por un tick.""",
+del shader por un 'tick'.""",
+#----------------------------------
 "help_flow#toggle_tool_box": """\
-puntea para {'abrir' if self.state == 'down' else 'cerrar'} la
-ventanita para introducir los
-valores/argumentos del shader.""",
+{'abre' if self.state == 'down' else 'cierre'} la ventanita de los
+argumentos del shader.""",
 #==================================
 #---- OVERWRITING ae.gui_help -----
 "flow_id_ink": "Color 1{' (main_app.flow_id_ink)' if app.landscape else ''}",
@@ -149,6 +163,9 @@ valores/argumentos del shader.""",
 "mouse": "pos. ratón",
 "no vertex/fragment sections in shader {shader_filename}":
     "faltan los secciones de vertex/fragment en {shader_filename}",
+"paused": "pausado",
+"run": "va",
+"running": "corre",
 "shader compilation/start failed: {ex}": "error '{ex}' en arrancar el shader",
 "shader file {shader_filename} not found": "el fichero de shader {shader_filename} no existe",
 "tint_ink": "color",

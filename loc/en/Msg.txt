@@ -4,35 +4,33 @@
 "help_app_state#sound_volume": """\
 change sound volume
 
-tap all to the left
-to mute all sounds and to hide
-all shader animations.
+tap all to the left to mute sounds.
 
-current value: [b]{round(self.value * 100)}%[/b]
+current value: [b]{round(self.value * 100)}[/b]%
 
 Use 'lambda: main_app.sound_volume'
-expression for to dynamically change
-shader arguments.""",
+expression (or short 's') to
+dynamically change a shader argument.""",
 #----------------------------------
 #---- OVERWRITING ae.gui_help -----
 "help_app_state#vibration_volume": """\
 vibration intensity
 
-tap all to the left for
-to mute all vibrations.
+tap all to the left to mute all
+vibrations.
 
-current vibration: {round(self.value * 100)}%
+current vibration: [b]{round(self.value * 100)}[/b]%
 
 Use 'lambda: main_app.vibration_volume'
-expression for to dynamically change
-shader arguments.""",
+expression to dynamically change
+a shader argument.""",
 #----------------------------------
 #---- OVERWRITING ae.gui_help -----
 "help_app_state#render_frequency": """\
 adjust the animation frequency of the
 shader ticker.
 
-current frequency: {round(self.value)}Hz
+current frequency: [b]{round(self.value)}[/b]Hz
 
 By moving the slider all to the left the
 shader ticker will be disabled and a
@@ -40,104 +38,120 @@ shader ticker will be disabled and a
 advance the shader animation.""",
 #==================================
 "help_flow#add_shader": """\
-tap to add a new
-instance of the
-specified shader
-file.""",
-"help_flow#open_file_chooser:shader_filename": """\
-tap to open the
-file chooser to
-load the next
-shader file.""",
+add another instance of the
+currently selected shader [b]{main_app.shaders_idx}[/b].""",
+#----------------------------------
 "help_flow#del_shader": """\
-tap to remove this
-running shader.""",
+remove the currently
+selected shader [b]{main_app.shaders_idx}[/b].""",
+#----------------------------------
+"help_flow#open_file_chooser:shader_filename": """\
+open the file chooser to
+load the other file for
+the shader [b]{main_app.shaders_idx}[/b].""",
+#----------------------------------
+"help_flow#run_shader": """\
+{"stop" if main_app.shaders_args[main_app.shaders_idx]['run_state'] == 'running' else "run"} the
+shader [b]{main_app.shaders_idx}[/b].""",
+#----------------------------------
+"help_flow#sel_shader": """\
+select the shader [b]{self.text.split('==')[0]}[/b]
+to edit the shader
+arguments.
+
+the button of the
+selected shader is
+displayed with the
+doubled width.{'''
+(this shader got
+already selected)''' if main_app.shaders_idx == int(self.text.split('==')[0]) else ""}""",
+#----------------------------------
 "help_flow#shader_arg_alpha": """\
 enter a float value between
 0.0 and 1.0 to set the
-{main_app.get_txt_(self.alias_name)} shader argument.
+[b]{main_app.get_txt_(self.alias_name)}[/b] shader argument.
 
-This value get interpreted
-by most shaders as opacity.
+This value get interpreted by
+most shaders as opacity.
 
 To change this value dynamically
 on a running shader specify a
 lambda expression like e.g.
-'lambda: main_app.sound_volume'.""",
+'lambda: main_app.sound_volume'
+(or short 's').""",
+#----------------------------------
 "help_flow#shader_arg_center_pos": """\
-enter a tuple of two float
-values or a lambda expression
-to set the {main_app.get_txt_(self.alias_name)}
-shader argument.
+enter a tuple of two float values or a
+lambda expression to set the shader
+argument [b]{main_app.get_txt_(self.alias_name)}[/b].
 
-Most shaders use this value
-as center position (x,y)
-for the shader animation.
+Most shaders use this value as center
+position (x,y) for the shader animation.
 
-The 'main_app.last_touch.pos'
-expression can be used
-to pass the last touch
-position on the render
-widget to the shader.
-""",
+the expressions 'main_app.last_touch'
+(short 'L') or 'main_app.mouse_pos'
+(short 'M') can be used to dynamically
+set this shader argument of a running
+shader to the last touch/mouse position.""",
+#----------------------------------
 "help_flow#shader_arg_contrast": """\
 enter a float value or
 a lambda expression to
-set the {main_app.get_txt_(self.alias_name)}
+set the [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument.""",
+#----------------------------------
 "help_flow#shader_arg_mouse": """\
 enter a tuple of two
 float values or a
 lambda expression to
-set the {main_app.get_txt_(self.alias_name)}
+set the [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument.""",
+#----------------------------------
 "help_flow#shader_arg_start_time": """\
-enter either 'None', a
-float value or a lambda
-expression to set this
-{main_app.get_txt_(self.alias_name)} shader
-argument.
+enter either a float value or a lambda
+expression in this shader argument
+[b]{main_app.get_txt_(self.alias_name)}[/b].
 
-entering '0.0' will
-synchronize the `time`
-shader argument with
-the render tick/clock.
+entering '0.0' will synchronize the
+shader with the render tick/clock.
 
-enter 'None' to start
-the `time` shader
-argument from zero.""",
+the lambda expression 'lambda: c() * 2.0'
+will run the shader animation reversed.""",
+#----------------------------------
 "help_flow#shader_arg_tex_col_mix": """\
 enter a float value or
 a lambda expression to
-set the {main_app.get_txt_(self.alias_name)}
+set the [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument.""",
+#----------------------------------
 "help_flow#shader_arg_tint_ink": """\
-enter a tuple of four float values or
-a lambda expression to specify the
-{main_app.get_txt_(self.alias_name)} shader argument.
+enter a tuple of four float values or a
+lambda expression to specify the shader
+argument [b]{main_app.get_txt_(self.alias_name)}[/b].
 
-Use one of the user preference colors
-in a lambda expression to dynamically
-change the color of a running shader.
-E.g. to use the Color 1 enter the lambda
-expression 'lambda: main_app.flow_id_ink'.
+Use one of the user preference colors in
+a lambda expression to dynamically change
+the color of a running shader, e.g. to use
+the Color 1 enter the lambda expression
+'lambda: main_app.flow_id_ink'.
 
 Color 2 get represented by 'flow_path_ink',
 Color 3 by 'selected_item_ink' and
 Color 4 by 'unselected_item_ink'.""",
+#----------------------------------
 "help_flow#shader_filename": """\
 enter the path of the
-shader code file or
-tap on the ... button
-on the right for to
-select a file via the
-file chooser.""",
+shader code file or tap
+on the [b]...[/b] button on
+the left to select a shader
+file via the file chooser.""",
+#----------------------------------
 "help_flow#next_render_tick": """\
-tap to manually advance the
-shader time by one tick.""",
+manually advance the shader
+time by one tick/frame.""",
+#----------------------------------
 "help_flow#toggle_tool_box": """\
-tap for to {'open' if self.state == 'down' else 'close'} the
-tool box for to modify
+{'open' if self.state == 'down' else 'close'} the tool box to modify
 the shader arguments.""",
 #==================================
 #---- OVERWRITING ae.gui_help -----

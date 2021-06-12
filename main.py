@@ -27,11 +27,11 @@ from ae.inspector import try_eval
 from ae.updater import check_moves
 from ae.gui_app import APP_STATE_SECTION_NAME, EventKwargsType
 from ae.kivy_app import FlowButton, KivyMainApp, get_txt
-from ae.kivy_glsl import DEFAULT_FPS, ShaderIdType, ShadersMixin, BUILT_IN_SHADERS, shader_parameters
+from ae.kivy_glsl import BUILT_IN_SHADERS, DEFAULT_FPS, ShaderIdType, shader_parameters, ShadersMixin
 from ae.kivy_sideloading import SideloadingMainAppMixin
 
 
-__version__ = '0.1.17'
+__version__ = '0.2.18'
 
 
 HIST_TOUCH_MAX = 3
@@ -56,7 +56,7 @@ def field_calc_key(value: PosValType, matrix: str, key: str) -> PosValType:
 
 
 class ShaderArgInput(BoxLayout):
-    """ layout containing label and text input for to edit the value of a shader argument. """
+    """ layout containing label and text input to edit the value of a shader argument. """
     arg_name = StringProperty()
 
 
@@ -75,15 +75,17 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
     mouse_pos: PosValType                           #: current mouse pointer position in the shader widget
     next_shader: str                                #: code of the next shader to add (non-persistent app state)
     render_frequency: float = DEFAULT_FPS           #: shader tick timer frequency app state
-    render_widget: ShadersMixin                     #: widget for to display shader output
-    shaders_args: List[Dict[str, str]] = list()     #: arguments for all shaders
-    shaders_idx: int = 0                            #: currently editable/selected shader arguments
+    render_widget: ShadersMixin                     #: widget to display shader output
+    shaders_args: List[Dict[str, str]] = list()     #: arguments for added shaders (app state)
+    shaders_idx: int = 0                            #: currently editable/selected shader (app state)
 
     _shader_tick_timer: ClockEvent = None
 
     def _init_default_user_cfg_vars(self):
+        """ add/initialize user-specific app states of this app. """
         super()._init_default_user_cfg_vars()
         self.user_specific_cfg_vars |= {
+            (APP_STATE_SECTION_NAME, 'render_frequency'),
             (APP_STATE_SECTION_NAME, 'shaders_args'),
             (APP_STATE_SECTION_NAME, 'shaders_idx'),
         }
@@ -129,15 +131,17 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         if arg_name == 'run_state':
             shader_id['run_state'] = value
             shader_id['error_message'] = error_message
-        elif shader_args['run_state'] != 'paused':
+        else:
             if arg_name == 'shader_filename':
                 errors = self.eval_and_push_shader_file(shader_args, shader_id)
             else:
                 errors = self.eval_and_push_shader_args(shader_args, shader_id)
-            if errors and shader_args['run_state'] != 'error':
+            if errors and shader_args['run_state'] == 'running':
                 err_msg = "\n".join(errors)
                 self.show_message(err_msg, title=get_txt("shader {self.shaders_idx} error(s)", count=len(errors)))
                 self.change_shader_arg('run_state', 'error', error_message=err_msg)
+            elif not errors and shader_args['run_state'] == 'error':
+                self.change_shader_arg('run_state', 'running')
 
         self.render_widget.update_shaders()
         if shader_id['run_state'] != shader_args['run_state']:
@@ -189,12 +193,11 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         :return:                list of errors or empty list if no errors occurred.
         """
         errors = list()
-        shader_filename = shader_args['shader_filename']
+        shader_filename = norm_path(shader_args['shader_filename'])
+        shader_code = ""
         if not os.path.exists(shader_filename):
             errors.append(get_txt("shader file {shader_filename} not found"))
-
-        shader_code = ""
-        if not errors:
+        else:
             shader_code = read_file_text(shader_filename)   # reload because self.next_shader could already be outdated
             if not shader_code:
                 errors.append(get_txt("empty shader code file {shader_filename}"))
@@ -216,7 +219,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         return self.render_widget.added_shaders[self.shaders_idx]
 
     def input_callables(self):
-        """ return dict of all input callables for to feed shader args. """
+        """ return dict of all input callables to feed shader args. """
         ren_wid = cast(Widget, self.render_widget)
 
         ica = dict(
@@ -243,7 +246,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         def _bind_idx_idx(_i):
             return lambda: (main_app.hist_touch[_i][0] / ren_wid.width, main_app.hist_touch[_i][1] / ren_wid.height)
         ica.update({'h' + str(idx + 1): _bind_idx_idx(idx) for idx in range(hist_len)})
-        ica.update({'h_' + str(abs(idx)): _bind_idx_idx(idx) for idx in range(-hist_len, 0)})
+        ica.update({'h_' + str(-idx): _bind_idx_idx(idx) for idx in range(-hist_len, 0)})
 
         return ica
 
@@ -316,7 +319,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
         self.change_shader_arg('shader_filename', file_path)
         chooser_popup.register_file_path(file_path, self)
-        chooser_popup.dismiss()
+        chooser_popup.close()
 
     def on_mouse_pos(self, _instance, pos):
         """ Window mouse position event handler. """
@@ -340,7 +343,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
         :param _flow_key:       unused/empty flow key.
         :param _event_kwargs:   unused event kwargs.
-        :return:                True for to confirm change of flow id else False.
+        :return:                True to confirm change of flow id else False.
         """
         shaders_args = self.shaders_args
         shader_args = shaders_args[self.shaders_idx].copy()
@@ -358,7 +361,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
         :param _flow_key:       unused flow key.
         :param _event_kwargs:   unused event kwargs.
-        :return:                always True for to confirm change of flow id.
+        :return:                always True to confirm change of flow id.
         """
         shaders_args = self.shaders_args
         shaders_idx = self.shaders_idx
@@ -379,7 +382,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
         :param _flow_key:       unused flow key.
         :param _event_kwargs:   unused event kwargs.
-        :return:                always True for to confirm change of flow id.
+        :return:                always True to confirm change of flow id.
         """
         self.vpo("GlslTesterApp.on_shader_run")
         running = 'paused' if self.shaders_args[self.shaders_idx]['run_state'] == 'running' else 'running'
@@ -391,7 +394,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
         :param flow_key:        str(index-in-shaders_args) + "==" + get_txt(<run-state>).
         :param _event_kwargs:   unused event kwargs.
-        :return:                always True for to confirm change of flow id.
+        :return:                always True to confirm change of flow id.
         """
         self.vpo("GlslTesterApp.on_shader_sel")
         self.change_app_state('shaders_idx', int(flow_key.split("==", maxsplit=1)[0]))
@@ -403,7 +406,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
         :param _flow_key:       unused/empty flow key.
         :param _event_kwargs:   unused event kwargs.
-        :return:                always True for to confirm change of flow id.
+        :return:                always True to confirm change of flow id.
         """
         self.vpo("GlslTesterApp.on_tool_box_toggle")
         tool_box = self.framework_root.ids.tool_box

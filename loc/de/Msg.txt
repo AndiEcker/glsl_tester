@@ -4,57 +4,72 @@
 "help_app_state#sound_volume": """\
 lautstärke ändern.
 
-tippe ganz links um
-alle akustischen
+tippe ganz links um akustische
 signale zu unterdrücken.
 
-aktuelle lautstärke: {round(self.value * 100)}%
+aktuelle lautstärke: [b]{round(self.value * 100)}[/b]%
 
 als 'lambda: main_app.sound_volume'
-ausdruck zum dynamischen ändern von
-shader argumenten verwendbar.""",
+ausdruck (oder kurz 's') zum
+dynamischen ändern von shader
+argumenten verwendbar.""",
 #----------------------------------
 #---- OVERWRITING ae.gui_help -----
 "help_app_state#vibration_volume": """\
 intensität vibrationen
 
-tippe ganz links um
-alle vibrationen zu
-unterdrücken.
+tippe ganz links um alle vibrationen
+zu unterdrücken.
 
-aktuelle vibration: {round(self.value * 100)}%
+aktuelle vibration: [b]{round(self.value * 100)}[/b]%
 
 als 'lambda: main_app.vibration_volume'
-ausdruck zum dynamischen ändern von
-shader argumenten verwendbar.""",
+ausdruck (oder kurz 'v') zum dynamischen
+ändern von shader argumenten verwendbar.""",
 #----------------------------------
-#---- OVERWRITING ae.gui_help -----
 "help_app_state#render_frequency": """\
 animations-frequenz des shader-zeitgebers.
 
-aktuelle frequenz: {round(self.value)}Hz
+aktuelle frequenz: [b]{round(self.value)}[/b]Hz
 
 schiebe den regler ganz nach links um den
-shader-zeitgeber zu deativieren und um die
-'tick'-schaltfläche anzuzeigen mit welcher
+shader-zeitgeber zu deativieren und um
+den [b]tick[/b]-knopf anzuzeigen, mit dem
 die shader-animation manuel um eine
 zeit-einheit weiterbewegt werden kann.""",
 #==================================
 "help_flow#add_shader": """\
-tippe um eine neue instanz
-der angegebenen shader-datei
-zu erstellen.""",
-"help_flow#open_file_chooser:shader_filename": """\
-tippe um das datei-
-auswahl-fenster zu
-öffnen um die shader-
-datei auszuwählen.""",
+erstellt eine neue instanz
+des gerade zur bearbeitung
+ausgewählten shaders [b]{main_app.shaders_idx}[/b].""",
+#----------------------------------
 "help_flow#del_shader": """\
-tippe um diesen laufenden
-shader zu entfernen.""",
+entfernt den gerade zur
+bearbeitung gewählten
+shader [b]{main_app.shaders_idx}[/b].""",
+#----------------------------------
+"help_flow#open_file_chooser:shader_filename": """\
+öffnet das datei-auswahl-fenster
+zur auswahl einer neuen datei
+für shader [b]{main_app.shaders_idx}[/b].""",
+#----------------------------------
+"help_flow#run_shader": """\
+shader [b]{main_app.shaders_idx}[/b]
+{"stoppen" if main_app.shaders_args[main_app.shaders_idx]['run_state'] == 'running' else "starten"}.""",
+#----------------------------------
+"help_flow#sel_shader": """\
+shader [b]{self.text.split('==')[0]}[/b] zur bearbeitung
+auswählen.
+
+der knopf des zur bearbeitung
+ausgewählten shaders wird in
+doppelter breite angezeigt.{'''
+(dieser shader ist bereits
+ausgewählt)''' if main_app.shaders_idx == int(self.text.split('==')[0]) else ""}""",
+#----------------------------------
 "help_flow#shader_arg_alpha": """\
 gebe einen numerischen wert zwischen '0.0'
-und '1.0' für das {main_app.get_txt_(self.alias_name)}
+und '1.0' für das [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument ein. Dieser wert beeinflusst
 die transparenz der shader-ausgabe.
 
@@ -73,59 +88,61 @@ eingabe 'lambda: main_app.sound_volume'
 oder kurz 's' macht z.B. den lautstärke-
 regler zum dynamischen shader-eingabe-wert
 (die vibrations-intensität via 'v').""",
+#----------------------------------
 "help_flow#shader_arg_center_pos": """\
 gebe zwei komma-werte (z.B. '100.0, 200.0')
 oder einen lambda-ausdruck für das
-{main_app.get_txt_(self.alias_name)} shader argument ein.
+[b]{main_app.get_txt_(self.alias_name)}[/b] shader argument ein.
 
 die meisten shader nutzen dieses
 argument als zentrale bildschirm-
 position (x,y) der animation.
 
-der ausdruck 'main_app.last_touch.pos',
-welcher die zuletzt angetippte bildschirm-
-position repräsentiert, kann dazu z.B.
-verwendet werden.
-""",
+die ausdrücke 'main_app.last_touch'
+(kurz 'T') oder 'main_app.mouse_pos'
+(kurz 'M') können verwendet werden um
+dieses shader argument dynamisch - im
+laufenden shader - zu ändern.""",
+#----------------------------------
 "help_flow#shader_arg_contrast": """\
 gebe einen numerischen komma-wert
 oder einen lambda-ausdruck ein um
-das {main_app.get_txt_(self.alias_name)} shader argument
-zu setzen.""",
+das [b]{main_app.get_txt_(self.alias_name)}[/b] shader
+argument zu setzen.""",
+#----------------------------------
 "help_flow#shader_arg_mouse": """\
-diese eingabe repräsentiert - ähnlich
-wie 'center_pos' - eine bildschirm-
-position (x, y).
+diese eingabe repräsentiert, ähnlich
+beim shader argument [b]{main_app.get_txt_('center_pos')}[/b],
+eine bildschirm-position (x, y).
 
 gebe entweder zwei komma-werte oder
 einen lambda-ausdruck ein um das
-{main_app.get_txt_(self.alias_name)} shader argument
+[b]{main_app.get_txt_(self.alias_name)}[/b] shader argument
 zu setzen.""",
+#----------------------------------
 "help_flow#shader_arg_start_time": """\
-gebe entweder 'None', einen
-komma-wert oder einen lambda-
-ausdruck für das shader
-argument {main_app.get_txt_(self.alias_name)} ein.
+[b]{main_app.get_txt_(self.alias_name)}[/b] in sekunden
+als komma-wert oder einen lambda-ausdruck.
 
-wird der komma-wert '0.0'
-eingegeben dann wird der
-shader-zeitgeber mit allen
-anderen laufenden shadern
-synchronisiert.
+ein komma-wert bewirkt einen versatz zum
+shader-zeitgeber. '0.0' synchronisiert den
+shader-zeitgeber.
 
-bei eingabe von 'None'
-startet der shader-
-zeitgeber bei null.
+bei eingabe eines lambda-ausdruck wie z.b.
+'lambda: c() * 2.0' läuft die animation
+des shaders rückwärts.
 
-'c' repräsentiert den wert
-des laufenden zeitgebers.""",
+'c' repräsentiert den wert des laufenden
+zeitgebers (Clock.get_boottime()).""",
+#----------------------------------
 "help_flow#shader_arg_tex_col_mix": """\
 gebe einen komma-wert oder
 einen lambda-ausdruck für
-das {main_app.get_txt_(self.alias_name)}
+das [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument ein.""",
+#----------------------------------
 "help_flow#shader_arg_tint_ink": """\
-das {main_app.get_txt_(self.alias_name)} shader argument
+das [b]{main_app.get_txt_(self.alias_name)}[/b] shader argument
 repräsentiert eine farbe bestehend aus
 vier komma-werten (rot, grün, blau
 und alpha) zwischen 0.0 and 1.0.
@@ -141,19 +158,23 @@ farbe entspricht dabei dem ausdruck
 zur dynamischen änderung im laufenden shader
 stelle dem eingegebenen ausdruck die
 zeichenfolge 'lambda: ' voraus.""",
+#----------------------------------
 "help_flow#shader_filename": """\
-gib den pfad der shader-datei ein oder
-tippe auf die ...-schaltfläche rechts
-daneben um eine shader-datei auszuwählen.""",
+pfad der shader-datei eingeben oder
+auf die [b]...[/b]-schaltfläche links
+daneben tippen um eine shader-datei
+auszuwählen.""",
+#----------------------------------
 "help_flow#next_render_tick": """\
-tippe um (bei deaktiviertem
-shader-zeitgeber) die shader-
-animation manuell auf den
-nächsten wert zu setzen.""",
+die shader-animation manuell auf
+den nächsten wert zu setzen.
+
+(dieser knopf ist nur sichtbar bei
+deaktiviertem shader-zeitgeber)""",
+#----------------------------------
 "help_flow#toggle_tool_box": """\
-tippe um das fenster zur
-eingabe der shader-argumente
-zu {'öffnen' if self.state == 'down' else 'schließen'}.""",
+fenster zur eingabe und bearbeitung
+der shader argumente {'öffnen' if self.state == 'down' else 'schließen'}.""",
 #==================================
 #---- OVERWRITING ae.gui_help -----
 "flow_id_ink": "farbe 1{' (main_app.flow_id_ink)' if app.landscape else ''}",
@@ -162,8 +183,8 @@ zu {'öffnen' if self.state == 'down' else 'schließen'}.""",
 "unselected_item_ink": "farbe 4{' (main_app.unselected_item_ink)' if app.landscape else ''}",
 #----------------------------------
 "shader {self.shaders_idx} error(s)":
-    """{str(count) + " " if count else ""}fehler in shader {self.shaders_idx}""",
-"alpha": "transparenz",
+    """{str(count) + " " if count > 1 else ""}fehler in shader {self.shaders_idx}""",
+"alpha": "opazität",
 "animation exception - stopped timer": "animationsfehler - zeitgeber angehalten",
 "center_pos": "zentral-pos.",
 "contrast": "kontrast",
@@ -172,10 +193,13 @@ zu {'öffnen' if self.state == 'down' else 'schließen'}.""",
 "invalid expression '{arg_inp}' in shader argument [b]{main_app.get_txt_(arg_name)}[/b]":
     "der ausdruck '{arg_inp}' der input variable [b]{main_app.get_txt_(arg_name)}[/b] ist fehlerhaft",
 "missing shader argument app state [b]{main_app.get_txt_(arg_name)}[/b]":
-    "shader parameter [b]{main_app.get_txt_(arg_name)}[/b] ist nicht definiert",
+    "shader parameter [b]{main_app.get_txt_(arg_name)}[/b] ist ungültig",
 "mouse": "maus-pos.",
 "no vertex/fragment sections in shader {shader_filename}":
     "vertex/fragment abschnitte fehlen im shader {shader_filename}",
+"paused": "gestoppt",
+"run": "lauf",
+"running": "läuft",
 "shader compilation/start failed: {ex}": "shader-start-fehler: {ex}",
 "shader file {shader_filename} not found": "shader-datei {shader_filename} existiert nicht",
 "tint_ink": "farbe",
