@@ -2,10 +2,13 @@
 GlslTester - play with glsl shaders
 ===================================
 
-Write, compile and run glsl shader code on any platform supported by Kivy.
+run glsl shader code on any platform supported by Kivy.
 """
 import os
-from typing import List, Tuple, Union, cast
+# WARNING: uncommenting next line produces thousands of log lines per second:
+# os.environ['KIVY_GL_DEBUG'] = '1'
+
+from typing import Any, Dict, List, Tuple, Union, cast
 
 # noinspection PyProtectedMember
 from kivy._clock import ClockEvent
@@ -22,13 +25,13 @@ from ae.files import read_file_text, write_file_text
 from ae.paths import PATH_PLACEHOLDERS, norm_path
 from ae.inspector import try_eval
 from ae.updater import check_moves
-from ae.gui_app import EventKwargsType
+from ae.gui_app import APP_STATE_SECTION_NAME, EventKwargsType
 from ae.kivy_app import FlowButton, KivyMainApp, get_txt
-from ae.kivy_glsl import ShadersMixin, BUILT_IN_SHADERS
+from ae.kivy_glsl import DEFAULT_FPS, ShaderIdType, ShadersMixin, BUILT_IN_SHADERS, shader_parameters
 from ae.kivy_sideloading import SideloadingMainAppMixin
 
 
-__version__ = '0.1.16'
+__version__ = '0.1.17'
 
 
 HIST_TOUCH_MAX = 3
@@ -37,11 +40,12 @@ PosValType = Tuple[float, float]
 
 
 def field_calc_key(value: PosValType, matrix: str, key: str) -> PosValType:
-    """
-    :param value:               current field value.
-    :param matrix:              field char matrix.
-    :param key:                 input key character
-    :return:                    new field value.
+    """ de-/increment x, y component of `value` by 0.1 if pressed `key` is in key `matrix`.
+
+    :param value:               current field value: relative position (x, y) tuple; x/y values between 0.0 and 1.0.
+    :param matrix:              field char matrix: 9 chars/keys from bottom/left (-0.1, -0.1) to top/right (+0.1, +0.1).
+    :param key:                 pressed key character.
+    :return:                    unchanged or de-/incremented field value.
     """
     idx = matrix.find(key)
     if idx == 4:
@@ -63,18 +67,153 @@ class ShaderButton(FlowButton):
 
 class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
     """ main app class. """
-    e_field_pos: PosValType                 #: e-key input field
-    hist_touch: List[PosValType]            #: last touch history
-    i_field_pos: PosValType                 #: i-key input field
-    last_key: float                         #: last key ord code
-    last_touch: PosValType                  #: last touch event: init=DefaultTouch(), update=RenderWidget.on_touch_down
-    mouse_pos: PosValType                   #: current mouse pointer position in the shader widget
-    next_shader: str                        #: non-persistent app state holding the code of the next shader to add
-    render_frequency: float                 #: renderer tick timer frequency
-    render_widget: ShadersMixin             #: widget for to display shader output
-    shader_filename: str                    #: current shader filename app state
+    e_field_pos: PosValType                         #: e-key input field
+    hist_touch: List[PosValType]                    #: last touch history
+    i_field_pos: PosValType                         #: i-key input field
+    last_key: float                                 #: last key ord code
+    last_touch: PosValType                          #: event-init=DefaultTouch(), -update=RenderWidget.on_touch_down
+    mouse_pos: PosValType                           #: current mouse pointer position in the shader widget
+    next_shader: str                                #: code of the next shader to add (non-persistent app state)
+    render_frequency: float = DEFAULT_FPS           #: shader tick timer frequency app state
+    render_widget: ShadersMixin                     #: widget for to display shader output
+    shaders_args: List[Dict[str, str]] = list()     #: arguments for all shaders
+    shaders_idx: int = 0                            #: currently editable/selected shader arguments
 
     _shader_tick_timer: ClockEvent = None
+
+    def _init_default_user_cfg_vars(self):
+        super()._init_default_user_cfg_vars()
+        self.user_specific_cfg_vars |= {
+            (APP_STATE_SECTION_NAME, 'shaders_args'),
+            (APP_STATE_SECTION_NAME, 'shaders_idx'),
+        }
+
+    def add_shader_to_render_widget(self) -> bool:
+        """ add the currently selected shader to the render widget - even on error in args or file name.
+
+        :return:                True if no error occurred and shader got added, else False.
+        """
+        shader_args = self.shaders_args[self.shaders_idx]
+        shader_id = dict(run_state=shader_args['run_state'], time=0.0, update_freq=0.0)
+        errors = list()
+
+        errors.extend(self.eval_and_push_shader_file(shader_args, shader_id))
+        if not errors:
+            errors.extend(self.eval_and_push_shader_args(shader_args, shader_id))
+
+        self.render_widget.add_shader(**shader_id)
+
+        if errors:
+            err_msg = "\n".join(errors)
+            self.show_message(err_msg, title=get_txt("shader {self.shaders_idx} error(s)", count=len(errors)))
+            self.change_shader_arg('run_state', 'error', error_message=err_msg)
+
+        shader_id['run_state'] = shader_args['run_state']
+
+        return not errors
+
+    def change_shader_arg(self, arg_name: str, value: str, error_message: str = ""):
+        """ change value of a single shader argument in shaders_args app state and shader id of selected shader.
+
+        :param arg_name:        shader argument name.
+        :param value:           shader argument value to set/change.
+        :param error_message:   error message string (passed to shader arg `error_message` if arg_name=='run_state')
+        :return:
+        """
+        shader_args = self.shaders_args[self.shaders_idx]
+        shader_id = self.id_of_selected_shader()
+
+        shader_args[arg_name] = value
+        self.change_app_state('shaders_args', self.shaders_args)
+
+        if arg_name == 'run_state':
+            shader_id['run_state'] = value
+            shader_id['error_message'] = error_message
+        elif shader_args['run_state'] != 'paused':
+            if arg_name == 'shader_filename':
+                errors = self.eval_and_push_shader_file(shader_args, shader_id)
+            else:
+                errors = self.eval_and_push_shader_args(shader_args, shader_id)
+            if errors and shader_args['run_state'] != 'error':
+                err_msg = "\n".join(errors)
+                self.show_message(err_msg, title=get_txt("shader {self.shaders_idx} error(s)", count=len(errors)))
+                self.change_shader_arg('run_state', 'error', error_message=err_msg)
+
+        self.render_widget.update_shaders()
+        if shader_id['run_state'] != shader_args['run_state']:
+            shader_args['run_state'] = shader_id['run_state']
+            if shader_id['run_state'] == 'error':
+                self.show_message(shader_id['error_message'],
+                                  title=get_txt("shader {self.shaders_idx} error(s)", count=1))
+        self._update_shader_buttons()
+
+    def eval_and_push_shader_args(self, shader_args: Dict[str, str], shader_id: Dict[str, Any]) -> List[str]:
+        """ evaluate shader glsl args/macros entered by user and if ok then push it to respective pre-shader-id kwarg.
+
+        :param shader_args:     shader arguments or lambdas entered by user.
+        :param shader_id:       either flat dict with all shader arguments (pre :meth:`~ShadersMixin.add_shader`) or
+                                dict that got already converted to a shader id by :meth:`~ShadersMixin.add_shader` (and
+                                added to :attr:`~ShadersMixin.added_shaders`).
+        :return:                list of errors or empty list if no errors occurred.
+        """
+        errors = list()
+        glo_vars = globals().copy()     # contains main_app variable from module level
+        glo_vars.update(Clock=Clock, Window=Window, _add_base_globals=True)
+        glo_vars.update(self.input_callables())
+
+        for arg_name in shader_parameters(self.next_shader):
+            arg_inp = shader_args.get(arg_name)
+            if arg_inp is None:
+                errors.append(get_txt("missing shader argument app state [b]{main_app.get_txt_(arg_name)}[/b]"))
+                continue
+            if not arg_inp:
+                self.vpo(f"   #  skipping empty shader argument {arg_name}/{main_app.get_txt_(arg_name)}")
+                continue
+
+            arg_val = try_eval(arg_inp, ignored_exceptions=(Exception, ), glo_vars=glo_vars)
+            if arg_val is UNSET:
+                errors.append(
+                    get_txt("invalid expression '{arg_inp}' in shader argument [b]{main_app.get_txt_(arg_name)}[/b]"))
+                continue
+
+            dic = shader_id['glsl_dyn_args'] if 'glsl_dyn_args' in shader_id and arg_name != 'start_time' else shader_id
+            dic[arg_name] = arg_val
+
+        return errors
+
+    def eval_and_push_shader_file(self, shader_args: Dict[str, str], shader_id: Dict[str, Any]) -> List[str]:
+        """ eval shader file name entered by user and if ok then push it to respective pre-shader-id kwarg.
+
+        :param shader_args:     shader arguments or lambdas entered by user.
+        :param shader_id:       shader arguments as flat dict (from user input) or as shader id (added shader).
+        :return:                list of errors or empty list if no errors occurred.
+        """
+        errors = list()
+        shader_filename = shader_args['shader_filename']
+        if not os.path.exists(shader_filename):
+            errors.append(get_txt("shader file {shader_filename} not found"))
+
+        shader_code = ""
+        if not errors:
+            shader_code = read_file_text(shader_filename)   # reload because self.next_shader could already be outdated
+            if not shader_code:
+                errors.append(get_txt("empty shader code file {shader_filename}"))
+        self.change_app_state('next_shader', shader_code)
+
+        if not errors:
+            if ".fs" in shader_filename:
+                shader_id['shader_code'] = shader_code
+            else:
+                shader_id['shader_file'] = shader_filename
+                if self.debug:
+                    lower_code = shader_code.lower()
+                    if "---vertex" not in lower_code or "---fragment" not in lower_code:
+                        errors.append(get_txt("no vertex/fragment sections in shader {shader_filename}"))
+        return errors
+
+    def id_of_selected_shader(self) -> ShaderIdType:
+        """ determine the shader_id of the currently selected shader. """
+        return self.render_widget.added_shaders[self.shaders_idx]
 
     def input_callables(self):
         """ return dict of all input callables for to feed shader args. """
@@ -130,7 +269,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
     def on_app_start(self):
         """ ensure that the non-persistent app states are available before widget tree build. """
         super().on_app_start()
-        self.change_app_state('next_shader', "")  # self.next_shader = self.framework_app.app_states['next_shader'] = ""
+        self.change_app_state('next_shader', "")  # init. to prevent key-errors in start-event-loop-kv-build
 
     def on_app_started(self):
         """ initialize render_widget after kivy app and window got initialized. """
@@ -143,16 +282,24 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         self.e_field_pos = ini_pos_val
         self.hist_touch = list()
         self.i_field_pos = ini_pos_val
-        self.last_key = ini_sca_val
+        self.last_key = ini_sca_val                                         # between 0.0 and 255.0 (have to be float)
+        ini_pos_val = (Window.width / 2.001, Window.height / 2.001)         # window center
         self.last_touch = ini_pos_val
         self.mouse_pos = ini_pos_val
         self.render_widget = self.framework_root.ids.render_widget
-        self.update_shader_file()
 
-        Window.bind(mouse_pos=self.on_mouse_pos)
+        for idx in range(len(self.shaders_args)):
+            self.shaders_idx = idx                                          # for change_shader_arg('run_state'..) calls
+            self.add_shader_to_render_widget()
+        self.shaders_idx = self.framework_app.app_states['shaders_idx']     # reset to persistent app state value
+
+        self.eval_and_push_shader_file(self.shaders_args[self.shaders_idx], self.id_of_selected_shader())
+        self._update_shader_buttons()
+
         self.on_render_frequency()
+        Window.bind(mouse_pos=self.on_mouse_pos)
         self.update_input_values()
-        Clock.schedule_interval(lambda *_args: self.update_input_values(), 0.999999)
+        Clock.schedule_interval(lambda *_args: self.update_input_values(), 0.333333333)
 
     def on_file_chooser_submit(self, file_path: str, chooser_popup: Widget):
         """ event callback from FileChooserPopup.on_submit() on selection of the next shader file to be added.
@@ -160,14 +307,14 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         :param file_path:       path string of selected file.
         :param chooser_popup:   file chooser popup/container widget.
         """
-        if chooser_popup.submit_to != 'shader_filename':    # == 'sideloading_file_mask':
-            # super().on_file_chooser_submit(file_path, chooser_popup)  # pass selected file to SideloadingMainAppMixin
+        if chooser_popup.submit_to != 'shader_filename':                # if == 'sideloading_file_mask':
+            super().on_file_chooser_submit(file_path, chooser_popup)    # pass selected file to SideloadingMainAppMixin
             return
         if not os.path.isfile(file_path):
             self.show_message(get_txt("{file_path} is not a shader file"), title=get_txt("select single file"))
             return
 
-        self.change_app_state('shader_filename', file_path)
+        self.change_shader_arg('shader_filename', file_path)
         chooser_popup.register_file_path(file_path, self)
         chooser_popup.dismiss()
 
@@ -178,6 +325,78 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
             self.vpo(f"GlslTesterApp.on_mouse_pos({_instance}, {pos})")
             self.mouse_pos: Tuple[float, ...] = tuple(map(float, pos))      # real type: PosValType
             self.update_input_values()
+
+    def on_render_frequency(self):
+        """ render frequency changed event handler. """
+        prf = self.render_frequency
+        self.vpo(f"GlslTesterApp.on_render_frequency(): frequency={prf}Hz")
+        if self._shader_tick_timer:
+            Clock.unschedule(self._shader_tick_timer)
+        if prf > self.get_var('render_frequency_min'):
+            self._shader_tick_timer = Clock.schedule_interval(self.render_tick, 1 / prf)
+
+    def on_shader_add(self, _flow_key: str, _event_kwargs: EventKwargsType) -> bool:
+        """ add shader to self.render_widget.
+
+        :param _flow_key:       unused/empty flow key.
+        :param _event_kwargs:   unused event kwargs.
+        :return:                True for to confirm change of flow id else False.
+        """
+        shaders_args = self.shaders_args
+        shader_args = shaders_args[self.shaders_idx].copy()
+
+        shaders_args.append(shader_args)
+        self.change_app_state('shaders_args', shaders_args)
+        self.change_app_state('shaders_idx', len(shaders_args) - 1)
+        ret = self.add_shader_to_render_widget()
+        self._update_shader_buttons()
+
+        return ret
+
+    def on_shader_del(self, _flow_key: str, _event_kwargs: EventKwargsType) -> bool:
+        """ remove args of selected shader from shaders_args and delete shader from self.render_widget.
+
+        :param _flow_key:       unused flow key.
+        :param _event_kwargs:   unused event kwargs.
+        :return:                always True for to confirm change of flow id.
+        """
+        shaders_args = self.shaders_args
+        shaders_idx = self.shaders_idx
+        self.vpo("GlslTesterApp.on_shader_del", shaders_idx)
+
+        self.render_widget.del_shader(self.id_of_selected_shader())
+        shaders_args.pop(shaders_idx)
+        if shaders_idx == len(shaders_args):
+            shaders_idx -= 1
+            self.change_app_state('shaders_idx', shaders_idx)
+        self.change_app_state('shaders_args', shaders_args)
+
+        self._update_shader_buttons()
+        return True
+
+    def on_shader_run(self, _flow_key: str, _event_kwargs: EventKwargsType) -> bool:
+        """ toggle the `run_state` shader arg of the currently selected shader.
+
+        :param _flow_key:       unused flow key.
+        :param _event_kwargs:   unused event kwargs.
+        :return:                always True for to confirm change of flow id.
+        """
+        self.vpo("GlslTesterApp.on_shader_run")
+        running = 'paused' if self.shaders_args[self.shaders_idx]['run_state'] == 'running' else 'running'
+        self.change_shader_arg('run_state', running)
+        return True
+
+    def on_shader_sel(self, flow_key: str, _event_kwargs: EventKwargsType) -> bool:
+        """ select shader, updating fields of shader args edit layout with selected shader values.
+
+        :param flow_key:        str(index-in-shaders_args) + "==" + get_txt(<run-state>).
+        :param _event_kwargs:   unused event kwargs.
+        :return:                always True for to confirm change of flow id.
+        """
+        self.vpo("GlslTesterApp.on_shader_sel")
+        self.change_app_state('shaders_idx', int(flow_key.split("==", maxsplit=1)[0]))
+        self._update_shader_buttons()
+        return True
 
     def on_tool_box_toggle(self, _flow_key: str, _event_kwargs: EventKwargsType) -> bool:
         """ toggle between display and hide of tool box.
@@ -191,150 +410,39 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         tool_box.visible = not tool_box.visible
         return True
 
-    def on_renderer_add(self, _flow_key: str, _event_kwargs: EventKwargsType) -> bool:
-        """ add renderer shader to self.render_widget.
-
-        :param _flow_key:       unused/empty flow key.
-        :param _event_kwargs:   unused event kwargs.
-        :return:                True for to confirm change of flow id else False.
-        """
-        title = get_txt("add shader error")
-        shader_filename = self.shader_filename
-        if not os.path.exists(shader_filename):
-            self.show_message(get_txt("shader file {shader_filename} not found"), title=title)
-            return False
-
-        shader_code = read_file_text(shader_filename)   # reload because self.next_shader could already be outdated
-        self.change_app_state('next_shader', shader_code)
-        if not shader_code:
-            self.show_message(get_txt("empty shader code file {shader_filename}"), title=title)
-            return False
-
-        kwargs = dict(time=0.0, update_freq=0.0)
-
-        if ".fs" in shader_filename:
-            kwargs['shader_code'] = shader_code
-        else:
-            kwargs['shader_file'] = shader_filename
-            if self.debug:
-                lower_code = shader_code.lower()
-                if "---vertex" not in lower_code or "---fragment" not in lower_code:
-                    self.show_message(get_txt("no vertex/fragment sections in shader {shader_filename}"), title=title)
-                    return False
-
-        glo_vars = globals().copy()     # contains main_app variable from module level
-        glo_vars.update(Clock=Clock, Window=Window, _add_base_globals=True)
-        glo_vars.update(self.input_callables())
-
-        for arg_name in self.shader_arg_names():
-            arg_inp = getattr(self, 'shader_arg_' + arg_name, UNSET)
-            if arg_inp is UNSET:
-                self.show_message(get_txt("missing 'shader_arg_{arg_name}' app state"), title=title)
-                return False
-            if not arg_inp:
-                self.vpo(f"   #  skipping empty shader argument {arg_name}")
-                continue
-
-            arg_val = try_eval(arg_inp, ignored_exceptions=(Exception, ), glo_vars=glo_vars)
-            if arg_val is UNSET:
-                self.show_message(get_txt("invalid expression in shader argument {arg_name}={arg_inp}"), title=title)
-                return False
-
-            kwargs[arg_name] = arg_val
-
-        self.render_widget.add_shader(**kwargs)
-
-        self._update_registered_renderers()
-
-        return True
-
-    def on_renderer_del(self, _flow_key: str, event_kwargs: EventKwargsType) -> bool:
-        """ remove renderer from self.render_widget.
-
-        :param _flow_key:       unused flow key.
-        :param event_kwargs:    event kwargs with 'shader_args' item containing the shader kwargs.
-        :return:                always True for to confirm change of flow id.
-        """
-        shader_id = event_kwargs['big_shader_id']
-        self.vpo("GlslTesterApp.on_renderer_del", shader_id)
-        self.render_widget.del_shader(shader_id)
-        self._update_registered_renderers()
-        return True
-
-    def on_render_frequency(self):
-        """ render frequency changed event handler. """
-        prf = self.render_frequency
-        self.vpo(f"GlslTesterApp.on_render_frequency(): frequency={prf}Hz")
-        if self._shader_tick_timer:
-            Clock.unschedule(self._shader_tick_timer)
-        if prf > self.get_var('render_frequency_min'):
-            self._shader_tick_timer = Clock.schedule_interval(self.render_tick, 1 / prf)
-
     def render_tick(self, *_args):
         """ timer for the animation of the running shaders. """
         render_widget = self.render_widget
         render_widget.next_tick()
         try:
-            render_widget.refresh_started_shaders()
+            render_widget.refresh_running_shaders()
         except (NameError, ValueError, Exception) as ex:
-            self.render_frequency = 0.0
-            self.on_render_frequency()
-            self.show_message(str(ex), title=get_txt("animation exception - stopped"))
-
-    def shader_arg_alias(self, arg_name: str) -> str:
-        """ check for alias for the passed shader argument name.
-
-        :param arg_name:        shader arg name.
-        :return:                alias (if found) or shader arg name (if not).
-        """
-        next_shader = self.next_shader
-        idx = next_shader.find(" " + arg_name + ";")
-        if idx >= 0:
-            line = next_shader[idx + len(arg_name) + 2:next_shader.find("\n", idx)]
-            idx = line.find("// ")
-            if idx >= 0:
-                arg_name = line[idx + 3:]
-        return arg_name
-
-    def shader_arg_names(self, *_args):
-        """ shader arg names of the shader code in the loaded shader file.
-
-        :param _args:           unused here - but needed in kv for to bind expression to kivy property
-        :return:                tuple of shader arg names of the currently loaded shader code, plus the
-                                `start_time` argument which controls, independent from to be included in the shader
-                                code, how the `time` argument get prepared/corrected in each render frame (see also
-                                :paramref:`ae.kivy_glsl.ShadersMixin.add_shader.start_time` and i18n help texts).
-        """
-        return (arg_name for arg_name in self.get_var('render_shader_args')
-                if arg_name == 'start_time' or " " + arg_name + ";" in self.next_shader)
+            self.change_app_state('render_frequency', 0.0)
+            self.show_message(str(ex), title=get_txt("animation exception - stopped timer"))
 
     def update_input_values(self):
-        """ display input values. """
-        def _v_f(k_: str, val: Union[float, Tuple[float, ...]]) -> str:
-            if isinstance(val, float):
-                dig = 3 if k_.islower() else 0
-                return f"{val:.{dig}f}"
-            return ",".join(_v_f(k_, v_) for v_ in val)
+        """ format and display input values. """
+        def _val_str(key: str, val: Union[float, Tuple[float, ...]]) -> str:
+            return f"{val:.{3 if key.islower() else 0}f}" if isinstance(val, float) \
+                else ",".join(_val_str(key, _v) for _v in val)
 
         ica = self.input_callables()
-        self.framework_root.ids.input_values.text = "   ".join(k + "=" + _v_f(k, v()) for k, v in ica.items())
+        self.framework_root.ids.input_values.text = "   ".join(k + "=" + _val_str(k, v()) for k, v in ica.items())
 
-    def _update_registered_renderers(self):
+    def _update_shader_buttons(self):
         """ update the running shaders buttons after add/delete of a running shader. """
-        shaders = self.render_widget.started_shaders
-        registered = list()
-        for shader_id in shaders:
-            kwargs = shader_id.copy()
-            kwargs['glsl_dyn_args'].pop('time', None)
-            kwargs['update_freq'] = 30.0
-            kwargs['_shader_id'] = shader_id
-            registered.append(kwargs)
-        self.framework_root.ids.running_shaders.registered_renderers = registered
+        buttons_kwargs = list()
+        for idx, shader_args in enumerate(self.shaders_args):
+            but_kwargs = dict(text=str(idx) + "==" + get_txt(shader_args['run_state']))
+            if shader_args['run_state'] == 'running':
+                but_shader_id = self.render_widget.added_shaders[idx].copy()
+                but_shader_id['glsl_dyn_args'].pop('time', None)
+                but_shader_id['render_shape'] = ('Ellipse', 'RoundedRectangle', 'Rectangle')[self.debug_level]
+                but_shader_id['update_freq'] = DEFAULT_FPS
+                but_kwargs['added_shaders'] = [but_shader_id]
+            buttons_kwargs.append(but_kwargs)
 
-    def update_shader_file(self):
-        """ shader file changed event handler. """
-        file_name = self.shader_filename
-        self.change_app_state('next_shader', read_file_text(file_name) if os.path.exists(file_name) else "")
+        self.framework_root.ids.running_shaders.shader_buttons = buttons_kwargs
 
 
 if __name__ == '__main__':

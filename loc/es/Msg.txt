@@ -7,7 +7,7 @@ volumen de sonidos
 para silenciar todos los sonidos puntea
 a la izquierda.
 
-volumen actual: {round(state_value * 100)}%
+volumen actual: {round(self.value * 100)}%
 
 Usar la expression
 'lambda: main_app.sound_volume'
@@ -21,9 +21,9 @@ para silenciar todos los
 vibraciones puntea a la
 izquierda.
 
-vibración actual: {round(state_value * 100)}%
+vibración actual: {round(self.value * 100)}%
 
-Usar la expression
+usa la expression
 'lambda: main_app.vibration_volume'
 para cambiar valores del shader.""",
 #----------------------------------
@@ -32,15 +32,15 @@ para cambiar valores del shader.""",
 ajustar la frequencia de la animación
 del shader.
 
-current frequency: {round(state_value)}Hz
+current frequency: {round(self.value)}Hz
 
-Moviendolo hacia la izquierda la
+moviendolo hacia la izquierda la
 animación automatica se desactivará
 y aparecerá un botón 'tick' para
 avanzar la animación de forma
 manualmente.""",
 #==================================
-"help_flow#add_renderer": """\
+"help_flow#add_shader": """\
 puntea ese botón para
 arrancar un nueva
 instancia del shader
@@ -49,17 +49,17 @@ cargado.""",
 puntea para abrir
 y cargar un nuevo
 fichero de shader.""",
-"help_flow#remove_renderer": """\
+"help_flow#del_shader": """\
 puntea para detener
 el shader arrancado.""",
 "help_flow#shader_arg_alpha": """\
 introducir un valor de punto flotante entre
-0.0 y 1.0 para el argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.
+0.0 y 1.0 para el argumento {main_app.get_txt_(self.alias_name)}.
 
-Este número esta interpretado por la
+este número esta interpretado por la
 mayoria de los shaders como opacidad.
 
-Para ajustar ese valor dinamicamente por un
+para ajustar ese valor dinamicamente por un
 shader arrancado, introduce lo como una
 expressión lambda, como por ejemplo
 'lambda: main_app.sound_volume' o 's' para
@@ -68,28 +68,28 @@ aquel de la intensidad de vibración).""",
 "help_flow#shader_arg_center_pos": """\
 introduzca una lista dos valores de
 punto flotante o una expressión de lambda
-para especificar el argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.
+para especificar el argumento {main_app.get_txt_(self.alias_name)}.
 
-La mayoria de los shaders usa este valor
+la mayoria de los shaders usa este valor
 como posición central (x,y) de la animación.
 
-También se puede usar por ejemplo la
+también se puede usar por ejemplo la
 expresión 'main_app.last_touch.pos'.
 """,
 "help_flow#shader_arg_contrast": """\
 introduzca un valor de punto flotante o
 una expresión lambda para especificar
-el argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+el argumento {main_app.get_txt_(self.alias_name)}
 del shader.""",
 "help_flow#shader_arg_mouse": """\
 introduzca una lista dos valores de
 punto flotante o una expressión de lambda
 para especificar el argumento
-{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.""",
+{main_app.get_txt_(self.alias_name)}.""",
 "help_flow#shader_arg_start_time": """\
 introduzca un valor de punto flotante o una
 expresión lambda para especificar el argumento
-{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} del shader.
+{main_app.get_txt_(self.alias_name)} del shader.
 
 introduzca '0.0' para sincronizar los shaders,
 'None' para tener un tiempo propio o 'c' para
@@ -97,20 +97,20 @@ detener el temporizador para este shader.""",
 "help_flow#shader_arg_tex_col_mix": """\
 introduzca un valor de punto flotante o
 una expresión lambda para especificar
-el argumento {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+el argumento {main_app.get_txt_(self.alias_name)}
 del shader.""",
 "help_flow#shader_arg_tint_ink": """\
 introduzca una lista cuatro valores de
 punto flotante o una expressión de lambda
 para especificar el argumento
-{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}.
+{main_app.get_txt_(self.alias_name)}.
 
-Usa una de los color del menu de los
+usa una de los color del menu de los
 preferencias de usuario, por ejemplo
 el Color 1 en una expresión de lambda
 como 'lambda: main_app.flow_id_ink'.
 
-El Color 2 es representado como
+el Color 2 es representado como
 'flow_path_ink',
 el Color 3 como 'selected_item_ink' y
 el Color 4 como 'unselected_item_ink'.""",
@@ -128,20 +128,24 @@ ventanita para introducir los
 valores/argumentos del shader.""",
 #==================================
 #---- OVERWRITING ae.gui_help -----
-"flow_id_ink": "color 1{' (main_app.flow_id_ink)' if app.landscape else ''}",
-"flow_path_ink": "color 2{' (main_app.flow_path_ink)' if app.landscape else ''}",
-"selected_item_ink": "color 3{' (main_app.selected_item_ink)' if app.landscape else ''}",
-"unselected_item_ink": "color 4{' (main_app.unselected_item_ink)' if app.landscape else ''}",
+"flow_id_ink": "Color 1{' (main_app.flow_id_ink)' if app.landscape else ''}",
+"flow_path_ink": "Color 2{' (main_app.flow_path_ink)' if app.landscape else ''}",
+"selected_item_ink": "Color 3{' (main_app.selected_item_ink)' if app.landscape else ''}",
+"unselected_item_ink": "Color 4{' (main_app.unselected_item_ink)' if app.landscape else ''}",
 #----------------------------------
-"add shader error": "error en añadir un shader",
+"shader {self.shaders_idx} error(s)":
+    {'one': "error en el shader {self.shaders_idx}",
+     'many': "{count} errores en el shader {self.shaders_idx}"},
 "alpha": "opacidad",
-"animation exception - stopped": "error de animación - suspendida",
-"center_pos: "pos. central",
+"animation exception - stopped timer": "error de animación - temporizador suspendido",
+"center_pos": "pos. central",
 "contrast": "contraste",
 "empty shader code file {shader_filename}": "fichero de shader {shader_filename} es vacio",
 "{file_path} is not a shader file": "{file_path} no es un fichero de código de shader",
-"invalid expression in shader argument {arg_name}": "la expresión de {arg_name}={arg_inp} no es válida",
-"missing 'shader_arg_{arg_name}' app state": "el 'shader_arg_{arg_name}' app state no existe",
+"invalid expression '{arg_inp}' in shader argument [b]{main_app.get_txt_(arg_name)}[/b]":
+    "la expresión de '{arg_inp}' del argumento [b]{main_app.get_txt_(arg_name)}[/b] no es válida",
+"missing shader argument app state [b]{main_app.get_txt_(arg_name)}[/b]'":
+    "el valor del argumento [b]{main_app.get_txt_(arg_name)}[/b] no existe",
 "mouse": "pos. ratón",
 "no vertex/fragment sections in shader {shader_filename}":
     "faltan los secciones de vertex/fragment en {shader_filename}",

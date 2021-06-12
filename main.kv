@@ -1,39 +1,55 @@
 #: import read_file_text ae.files.read_file_text
+#: import shader_parameter_alias ae.kivy_glsl.shader_parameter_alias
+#: import shader_parameters ae.kivy_glsl.shader_parameters
 # already imported via ae.kivy_sideloading/kv-string: #: import _f_ ae.kivy_file_chooser
 #: import _u_ ae.kivy_user_prefs
 <Main@BoxLayout>
     orientation: 'vertical'
-    BoxLayout:
+    StackLayout:
+        orientation: 'tb-lr'
         size_hint_y: None
-        height: app.app_states['font_size'] * 1.5 * (1 + 2 * app.main_app.debug_level)
-        spacing: '3sp'
+        height: app.button_height * 2
+        spacing: '3sp', 0
         HelpToggler:
+            size_hint: None, None
+            size: usr_pref.size
         UserPreferencesButton:
+            id: usr_pref
             size_hint_x: None
             width: self.height
-        FileChooserButton:
-            visible: not tool_box.visible
-        RunningShaders:
-            spacing: '3sp'
-            id: running_shaders
         FlowButton:
-            tap_flow_id: id_of_flow('add', 'renderer')
+            id: add_ren
+            tap_flow_id: id_of_flow('add', 'shader')
             icon_name: id_of_flow('add', 'item')
             disabled: not app.app_states['next_shader']
             size_hint_x: None
             width: self.height * (2.1 if app.landscape else 1.0)
-            relief_ellipse_inner_colors: relief_colors()
-            relief_ellipse_inner_lines: int(self.height / 4.5)
-            relief_ellipse_inner_offset: int(self.height / 7.5)
+            relief_ellipse_inner_colors: relief_colors((0.99, 0.99, 0.0))
+            relief_ellipse_inner_lines: 0 if self.disabled else int(self.height / 2.1)
+        FlowButton:
+            tap_flow_id: id_of_flow('del', 'shader')
+            icon_name: id_of_flow('delete', 'item')
+            disabled: len(app.app_states['shaders_args']) <= 1
+            size_hint_x: None
+            width: self.height * (2.1 if app.landscape else 1.0)
+            relief_square_inner_colors: relief_colors((0.99, 0.0, 0.0))
+            relief_square_inner_lines: 0 if self.disabled else int(self.height / 2.1)
+        RunningShaders:
+            id: running_shaders
+            size_hint_x: None
+            width:
+                self.parent.width - usr_pref.width - add_ren.width - sideloading_button.width - self.parent.spacing[0]*3
+            spacing: '3sp'
+        SideloadingButton:
+            id: sideloading_button
         FlowToggler:
             tap_flow_id: id_of_flow('toggle', 'tool_box')
             text: "^" if tool_box.visible else "v"
             size_hint_x: None
-            width: self.height
-            relief_ellipse_inner_colors: relief_colors()
-            relief_ellipse_inner_lines: int(self.height / 3.9)
-        SideloadingButton:
-            id: sideloading_button
+            width: sideloading_button.width
+            font_size: app.app_states['font_size'] * 1.62
+            relief_ellipse_inner_colors: relief_colors(Window.clearcolor)
+            relief_ellipse_inner_lines: int(self.height / (2.1 if tool_box.visible else 1.5))
     Widget:
         size_hint_y: None
         height: '6sp'
@@ -43,7 +59,7 @@
         disabled: not self.visible
         size_hint_y: None
         height:
-            round(2.4 * app.app_states['font_size'] + input_values.height + shader_args.minimum_height) \
+            round(2.4 * app.app_states['font_size'] + input_values.height + shader_args_layout.minimum_height) \
             if self.visible else 0
         orientation: 'vertical'
         padding: '6sp'
@@ -64,19 +80,31 @@
             padding: '3sp'
             size_hint_y: None
             height: app.app_states['font_size'] * 1.8 if tool_box.visible else 0.0
+            FileChooserButton:
+                visible: tool_box.visible
             FlowInput:
-                background_color: self.background_color[:3] + [1.0 if tool_box.visible else 0.0]
+                id: shader_filename
                 focus_flow_id: 'shader_filename'
-                text: app.app_states['shader_filename']
-                on_text: app.main_app.change_app_state('shader_filename', self.text)
                 size_hint_y: None
                 height: app.app_states['font_size'] * 1.8 if tool_box.visible else 0.0
+                background_color: self.background_color[:3] + [1.0 if tool_box.visible else 0.0]
+                text: app.app_states['shaders_args'][app.app_states['shaders_idx']]['shader_filename']
+                on_text: app.main_app.change_shader_arg('shader_filename', self.text)
                 auto_complete_texts: file_lines(norm_path("{ado}/ShaderFilenameSuggestions.txt"))
                 on_auto_complete_texts:
                     write_file_text(self.auto_complete_texts, norm_path("{ado}/ShaderFilenameSuggestions.txt"))
-                on_text: app.main_app.update_shader_file()
-            FileChooserButton:
-                visible: tool_box.visible
+            FlowToggler:
+                tap_flow_id: id_of_flow('run', 'shader')
+                size_hint_x: None
+                width: self.height * (2.1 if app.landscape else 1.0)
+                relief_ellipse_inner_colors:
+                    relief_colors(
+                    (0.0, 0.999, 0.0)
+                    if app.app_states['shaders_args'][app.app_states['shaders_idx']]['run_state'] == 'running' else
+                    (0.999, 0.999, 0.0)
+                    if app.app_states['shaders_args'][app.app_states['shaders_idx']]['run_state'] == 'paused' else
+                    (0.999, 0.0, 0.0))
+                relief_ellipse_inner_lines: int(self.height / 1.5) if tool_box.visible else 0
             OptionalButton:
                 tap_flow_id: id_of_flow('next', 'render_tick')
                 visible:
@@ -86,7 +114,7 @@
                 relief_square_inner_colors: relief_colors() if tool_box.visible else ()
                 relief_square_inner_lines: int(self.height / 3.9)
         ShaderArgs:
-            id: shader_args
+            id: shader_args_layout
         ImageLabel:
             id: input_values
             font_size: app.app_states['font_size'] * 0.9
@@ -98,6 +126,7 @@
     RenderWidget:
         id: render_widget
         size_hint_y: 1
+        size_hint_min: sp(90), sp(90)   # prevent division by zero on win resize
 
 
 <RenderWidget@ImageLabel+ShadersMixin>
@@ -122,22 +151,19 @@
 
 
 <ShaderButton>
-    tap_flow_id: id_of_flow('del', 'renderer')
-    tap_kwargs: dict(big_shader_id=self.big_shader_id)
+    tap_flow_id: id_of_flow('sel', 'shader', self.text)
+    size_hint_x:
+        1.0 / (len(app.app_states['shaders_args']) + 1) * (
+        2 if app.app_states['shaders_idx'] == int(self.text.split("==")[0]) else 1)
     size_hint_y: None
     height: self.parent.height if self.parent else self.height
     relief_ellipse_inner_colors: relief_colors()
     relief_ellipse_inner_lines: int(self.height / 3.9)
 
-<RunningShaders@DynamicChildrenBehavior+GridLayout>
-    rows: 1
-    registered_renderers: []
-    child_data_maps:
-        [dict(cls='ShaderButton',
-        kwargs=dict(text=_("remove"), added_shaders=[dic]),
-        attributes=dict(big_shader_id=dic['_shader_id']))
-        for dic in self.registered_renderers]
-    canvas:
+<RunningShaders@DynamicChildrenBehavior+StackLayout>
+    #orientation: 'horizontal'
+    shader_buttons: []
+    child_data_maps: [dict(cls='ShaderButton', kwargs=kwargs) for kwargs in self.shader_buttons]
 
 
 <ShaderArgInput>
@@ -145,18 +171,18 @@
     height: app.main_app.font_size * 1.8 if root.parent and root.parent.parent.visible else 0.0
     visible: bool(root.parent and root.parent.parent.visible)
     ImageLabel:
+        size_hint: 0.39, 1.0
         font_size: app.app_states['font_size'] * 0.69
-        # strange: text is visible in dark mode (even with color.alpha==0), therefore had to set it to empty string
-        text: _(app.main_app.shader_arg_alias(root.arg_name)) + ":" if root.visible else ""     # alt: opacity = 0
+        # strange: text is visible in dark mode (even with color.alpha==0), had to set it to "", alt: opacity = 0
+        text: _(shader_parameter_alias(app.app_states['next_shader'], root.arg_name)) + ":" if root.visible else ""
         text_size: self.width, None
         halign: 'right'
-        size_hint_x: 0.39
-        height: self.height if root.visible else 0.0
     FlowInput:
         background_color: self.background_color[:3] + [1.0 if root.visible else 0.0]
         focus_flow_id: 'shader_arg_' + root.arg_name
-        text: root.arg_name and app.app_states['shader_arg_' + root.arg_name]
-        on_text: app.main_app.change_app_state('shader_arg_' + root.arg_name, self.text)
+        text: root.arg_name and app.app_states['shaders_args'][app.app_states['shaders_idx']][root.arg_name]
+        on_text: app.main_app.change_shader_arg(root.arg_name, self.text)
+        alias_name: shader_parameter_alias(app.app_states['next_shader'], root.arg_name)
         sug_filename: os.path.join(norm_path("{sug}"), root.arg_name + "ShaderArg.txt")
         auto_complete_texts: file_lines(self.sug_filename)
         on_auto_complete_texts:write_file_text(self.auto_complete_texts, self.sug_filename)
@@ -166,7 +192,7 @@
     padding: '6sp'
     cols: max(1, int(Window.width / (15 * app.main_app.font_size)))
     child_data_maps:
-        [dict(cls='ShaderArgInput', kwargs=dict(arg_name=arg)) for arg in app.main_app.shader_arg_names(app.app_states)]
+        [dict(cls='ShaderArgInput', kwargs=dict(arg_name=p)) for p in shader_parameters(app.app_states['next_shader'])]
 
 
 <UserPreferencesPopup>:

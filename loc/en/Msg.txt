@@ -8,7 +8,7 @@ tap all to the left
 to mute all sounds and to hide
 all shader animations.
 
-current value: [b]{round(state_value * 100)}%[/b]
+current value: [b]{round(self.value * 100)}%[/b]
 
 Use 'lambda: main_app.sound_volume'
 expression for to dynamically change
@@ -21,7 +21,7 @@ vibration intensity
 tap all to the left for
 to mute all vibrations.
 
-current vibration: {round(state_value * 100)}%
+current vibration: {round(self.value * 100)}%
 
 Use 'lambda: main_app.vibration_volume'
 expression for to dynamically change
@@ -32,14 +32,14 @@ shader arguments.""",
 adjust the animation frequency of the
 shader ticker.
 
-current frequency: {round(state_value)}Hz
+current frequency: {round(self.value)}Hz
 
 By moving the slider all to the left the
 shader ticker will be disabled and a
 'tick' button will appear to manually
 advance the shader animation.""",
 #==================================
-"help_flow#add_renderer": """\
+"help_flow#add_shader": """\
 tap to add a new
 instance of the
 specified shader
@@ -49,13 +49,13 @@ tap to open the
 file chooser to
 load the next
 shader file.""",
-"help_flow#remove_renderer": """\
+"help_flow#del_shader": """\
 tap to remove this
 running shader.""",
 "help_flow#shader_arg_alpha": """\
 enter a float value between
 0.0 and 1.0 to set the
-{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader argument.
+{main_app.get_txt_(self.alias_name)} shader argument.
 
 This value get interpreted
 by most shaders as opacity.
@@ -67,7 +67,7 @@ lambda expression like e.g.
 "help_flow#shader_arg_center_pos": """\
 enter a tuple of two float
 values or a lambda expression
-to set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+to set the {main_app.get_txt_(self.alias_name)}
 shader argument.
 
 Most shaders use this value
@@ -83,19 +83,19 @@ widget to the shader.
 "help_flow#shader_arg_contrast": """\
 enter a float value or
 a lambda expression to
-set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+set the {main_app.get_txt_(self.alias_name)}
 shader argument.""",
 "help_flow#shader_arg_mouse": """\
 enter a tuple of two
 float values or a
 lambda expression to
-set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+set the {main_app.get_txt_(self.alias_name)}
 shader argument.""",
 "help_flow#shader_arg_start_time": """\
 enter either 'None', a
 float value or a lambda
 expression to set this
-{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader
+{main_app.get_txt_(self.alias_name)} shader
 argument.
 
 entering '0.0' will
@@ -109,12 +109,12 @@ argument from zero.""",
 "help_flow#shader_arg_tex_col_mix": """\
 enter a float value or
 a lambda expression to
-set the {main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))}
+set the {main_app.get_txt_(self.alias_name)}
 shader argument.""",
 "help_flow#shader_arg_tint_ink": """\
 enter a tuple of four float values or
 a lambda expression to specify the
-{main_app.get_txt_(main_app.shader_arg_alias(self.focus_flow_id[11:]))} shader argument.
+{main_app.get_txt_(self.alias_name)} shader argument.
 
 Use one of the user preference colors
 in a lambda expression to dynamically
