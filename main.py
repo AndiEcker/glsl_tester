@@ -31,7 +31,7 @@ from ae.kivy_glsl import BUILT_IN_SHADERS, DEFAULT_FPS, ShaderIdType, shader_par
 from ae.kivy_sideloading import SideloadingMainAppMixin
 
 
-__version__ = '0.2.18'
+__version__ = '0.2.20'
 
 
 HIST_TOUCH_MAX = 3

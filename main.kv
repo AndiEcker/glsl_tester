@@ -96,7 +96,8 @@
             FlowToggler:
                 tap_flow_id: id_of_flow('run', 'shader')
                 size_hint_x: None
-                width: self.height * (2.1 if app.landscape else 1.0) if tool_box.visible else 0.0
+                width: self.height * (2.1 if app.landscape else 1.0) if tool_box.visible else 0.0  # to not cover others
+                opacity: 1.0 if tool_box.visible else 0.0   # to hide text
                 text:
                     _("stop") \
                     if app.app_states['shaders_args'][app.app_states['shaders_idx']]['run_state'] == 'running' else \
@@ -164,7 +165,7 @@
     relief_ellipse_inner_colors: relief_colors()
     relief_ellipse_inner_lines: int(self.height / 3.9)
 
-<RunningShaders@DynamicChildrenBehavior+StackLayout>
+<RunningShaders@DynamicChildrenBehavior+BoxLayout>
     shader_buttons: []
     child_data_maps: [dict(cls='ShaderButton', kwargs=kwargs) for kwargs in self.shader_buttons]
 
