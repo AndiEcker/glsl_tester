@@ -84,7 +84,7 @@
                 visible: tool_box.visible
             FlowInput:
                 id: shader_filename
-                focus_flow_id: 'shader_filename'
+                focus_flow_id: id_of_flow('edit', 'shader_arg', 'filename')
                 size_hint_y: None
                 height: app.app_states['font_size'] * 1.8 if tool_box.visible else 0.0
                 background_color: self.background_color[:3] + [1.0 if tool_box.visible else 0.0]
@@ -172,7 +172,7 @@
 
 <ShaderArgInput>
     size_hint_y: None
-    height: app.main_app.font_size * 1.8 if root.parent and root.parent.parent.visible else 0.0
+    height: app.main_app.font_size * 1.8 if root.visible else 0.0
     visible: bool(root.parent and root.parent.parent.visible)
     ImageLabel:
         size_hint: 0.39, 1.0
@@ -183,7 +183,7 @@
         halign: 'right'
     FlowInput:
         background_color: self.background_color[:3] + [1.0 if root.visible else 0.0]
-        focus_flow_id: 'shader_arg_' + root.arg_name
+        focus_flow_id: id_of_flow('edit', 'shader_arg', root.arg_name)
         text: root.arg_name and app.app_states['shaders_args'][app.app_states['shaders_idx']][root.arg_name]
         on_text: app.main_app.change_shader_arg(root.arg_name, self.text)
         alias_name: shader_parameter_alias(app.app_states['next_shader'], root.arg_name)

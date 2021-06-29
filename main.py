@@ -31,7 +31,7 @@ from ae.kivy_glsl import BUILT_IN_SHADERS, DEFAULT_FPS, ShaderIdType, shader_par
 from ae.kivy_sideloading import SideloadingMainAppMixin
 
 
-__version__ = '0.2.20'
+__version__ = '0.2.21'
 
 
 HIST_TOUCH_MAX = 3
@@ -355,6 +355,16 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
         self._update_shader_buttons()
 
         return ret
+
+    # def on_shader_arg_edit(self, flow_key: str, event_kwargs: EventKwargsType) -> bool:
+    #     """ notification of shader arg edit field focus change - only for debugging.
+    #
+    #     :param flow_key:        shader arg or setting name.
+    #     :param event_kwargs:    (unused).
+    #     :return:                True to change flow id and flow path (actually not needed).
+    #     """
+    #     self.dpo(f"GlslTesterApp.on_shader_arg_edit {flow_key} {event_kwargs}")
+    #     return True
 
     def on_shader_del(self, _flow_key: str, _event_kwargs: EventKwargsType) -> bool:
         """ remove args of selected shader from shaders_args and delete shader from self.render_widget.

@@ -67,7 +67,7 @@ doppelter breite angezeigt.{'''
 (dieser shader ist bereits
 ausgewählt)''' if main_app.shaders_idx == int(self.text.split('==')[0]) else ""}""",
 #----------------------------------
-"help_flow#shader_arg_alpha": """\
+"help_flow#edit_shader_arg:alpha": """\
 gebe einen numerischen wert zwischen '0.0'
 und '1.0' für das [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument ein. Dieser wert beeinflusst
@@ -89,7 +89,7 @@ oder kurz 's' macht z.B. den lautstärke-
 regler zum dynamischen shader-eingabe-wert
 (die vibrations-intensität via 'v').""",
 #----------------------------------
-"help_flow#shader_arg_center_pos": """\
+"help_flow#edit_shader_arg:center_pos": """\
 gebe zwei komma-werte (z.B. '100.0, 200.0')
 oder einen lambda-ausdruck für das
 [b]{main_app.get_txt_(self.alias_name)}[/b] shader argument ein.
@@ -104,13 +104,13 @@ die ausdrücke 'main_app.last_touch'
 dieses shader argument dynamisch - im
 laufenden shader - zu ändern.""",
 #----------------------------------
-"help_flow#shader_arg_contrast": """\
+"help_flow#edit_shader_arg:contrast": """\
 gebe einen numerischen komma-wert
 oder einen lambda-ausdruck ein um
 das [b]{main_app.get_txt_(self.alias_name)}[/b] shader
 argument zu setzen.""",
 #----------------------------------
-"help_flow#shader_arg_mouse": """\
+"help_flow#edit_shader_arg:mouse": """\
 diese eingabe repräsentiert, ähnlich
 beim shader argument [b]{main_app.get_txt_('center_pos')}[/b],
 eine bildschirm-position (x, y).
@@ -120,7 +120,7 @@ einen lambda-ausdruck ein um das
 [b]{main_app.get_txt_(self.alias_name)}[/b] shader argument
 zu setzen.""",
 #----------------------------------
-"help_flow#shader_arg_start_time": """\
+"help_flow#edit_shader_arg:start_time": """\
 [b]{main_app.get_txt_(self.alias_name)}[/b] in sekunden
 als komma-wert oder einen lambda-ausdruck.
 
@@ -135,13 +135,13 @@ des shaders rückwärts.
 'c' repräsentiert den wert des laufenden
 zeitgebers (Clock.get_boottime()).""",
 #----------------------------------
-"help_flow#shader_arg_tex_col_mix": """\
+"help_flow#edit_shader_arg:tex_col_mix": """\
 gebe einen komma-wert oder
 einen lambda-ausdruck für
 das [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument ein.""",
 #----------------------------------
-"help_flow#shader_arg_tint_ink": """\
+"help_flow#edit_shader_arg:tint_ink": """\
 das [b]{main_app.get_txt_(self.alias_name)}[/b] shader argument
 repräsentiert eine farbe bestehend aus
 vier komma-werten (rot, grün, blau
@@ -159,7 +159,7 @@ zur dynamischen änderung im laufenden shader
 stelle dem eingegebenen ausdruck die
 zeichenfolge 'lambda: ' voraus.""",
 #----------------------------------
-"help_flow#shader_filename": """\
+"help_flow#edit_shader_arg:filename": """\
 pfad der shader-datei eingeben oder
 auf die [b]...[/b]-schaltfläche links
 daneben tippen um eine shader-datei

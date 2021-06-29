@@ -66,7 +66,7 @@ doubled width.{'''
 (this shader got
 already selected)''' if main_app.shaders_idx == int(self.text.split('==')[0]) else ""}""",
 #----------------------------------
-"help_flow#shader_arg_alpha": """\
+"help_flow#edit_shader_arg:alpha": """\
 enter a float value between
 0.0 and 1.0 to set the
 [b]{main_app.get_txt_(self.alias_name)}[/b] shader argument.
@@ -80,7 +80,7 @@ lambda expression like e.g.
 'lambda: main_app.sound_volume'
 (or short 's').""",
 #----------------------------------
-"help_flow#shader_arg_center_pos": """\
+"help_flow#edit_shader_arg:center_pos": """\
 enter a tuple of two float values or a
 lambda expression to set the shader
 argument [b]{main_app.get_txt_(self.alias_name)}[/b].
@@ -94,20 +94,20 @@ the expressions 'main_app.last_touch'
 set this shader argument of a running
 shader to the last touch/mouse position.""",
 #----------------------------------
-"help_flow#shader_arg_contrast": """\
+"help_flow#edit_shader_arg:contrast": """\
 enter a float value or
 a lambda expression to
 set the [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument.""",
 #----------------------------------
-"help_flow#shader_arg_mouse": """\
+"help_flow#edit_shader_arg:mouse": """\
 enter a tuple of two
 float values or a
 lambda expression to
 set the [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument.""",
 #----------------------------------
-"help_flow#shader_arg_start_time": """\
+"help_flow#edit_shader_arg:start_time": """\
 enter either a float value or a lambda
 expression in this shader argument
 [b]{main_app.get_txt_(self.alias_name)}[/b].
@@ -118,13 +118,13 @@ shader with the render tick/clock.
 the lambda expression 'lambda: c() * 2.0'
 will run the shader animation reversed.""",
 #----------------------------------
-"help_flow#shader_arg_tex_col_mix": """\
+"help_flow#edit_shader_arg:tex_col_mix": """\
 enter a float value or
 a lambda expression to
 set the [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument.""",
 #----------------------------------
-"help_flow#shader_arg_tint_ink": """\
+"help_flow#edit_shader_arg:tint_ink": """\
 enter a tuple of four float values or a
 lambda expression to specify the shader
 argument [b]{main_app.get_txt_(self.alias_name)}[/b].
@@ -139,7 +139,7 @@ Color 2 get represented by 'flow_path_ink',
 Color 3 by 'selected_item_ink' and
 Color 4 by 'unselected_item_ink'.""",
 #----------------------------------
-"help_flow#shader_filename": """\
+"help_flow#edit_shader_arg:filename": """\
 enter the path of the
 shader code file or tap
 on the [b]...[/b] button on

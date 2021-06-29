@@ -61,7 +61,7 @@ se muestra de doble ancho.{'''
 (este shader ya esta
 seleccionado)''' if main_app.shaders_idx == int(self.text.split('==')[0]) else ""}""",
 #----------------------------------
-"help_flow#shader_arg_alpha": """\
+"help_flow#edit_shader_arg:alpha": """\
 introducir un valor de punto flotante entre
 0.0 y 1.0 para el argumento [b]{main_app.get_txt_(self.alias_name)}[/b].
 
@@ -75,7 +75,7 @@ expressión lambda, como por ejemplo
 usar el deslizador del volumen ('v' para
 aquel de la intensidad de vibración).""",
 #----------------------------------
-"help_flow#shader_arg_center_pos": """\
+"help_flow#edit_shader_arg:center_pos": """\
 introduzca dos valores de punto flotante
 o una expressión de lambda para especificar
 el argumento [b]{main_app.get_txt_(self.alias_name)}[/b].
@@ -86,19 +86,19 @@ como posición central (x,y) de la animación.
 también se puede usar por ejemplo la
 expresión 'main_app.last_touch' or 'L'.""",
 #----------------------------------
-"help_flow#shader_arg_contrast": """\
+"help_flow#edit_shader_arg:contrast": """\
 introduzca un valor de punto flotante o
 una expresión lambda para especificar
 el argumento [b]{main_app.get_txt_(self.alias_name)}[/b]
 del shader.""",
 #----------------------------------
-"help_flow#shader_arg_mouse": """\
+"help_flow#edit_shader_arg:mouse": """\
 introduzca una lista dos valores de
 punto flotante o una expressión de lambda
 para especificar el argumento
 [b]{main_app.get_txt_(self.alias_name)}[/b].""",
 #----------------------------------
-"help_flow#shader_arg_start_time": """\
+"help_flow#edit_shader_arg:start_time": """\
 introduzca un valor de punto flotante o una
 expresión lambda para especificar el argumento
 [b]{main_app.get_txt_(self.alias_name)}[/b] del shader.
@@ -107,13 +107,13 @@ introduzca '0.0' para sincronizar los shaders,
 o un lambda e.g. con 'c()' para cambiar la
 velocidad de la animación del shader.""",
 #----------------------------------
-"help_flow#shader_arg_tex_col_mix": """\
+"help_flow#edit_shader_arg:tex_col_mix": """\
 introduzca un valor de punto flotante o
 una expresión lambda para especificar
 el argumento [b]{main_app.get_txt_(self.alias_name)}[/b]
 del shader.""",
 #----------------------------------
-"help_flow#shader_arg_tint_ink": """\
+"help_flow#edit_shader_arg:tint_ink": """\
 introduzca cuatro valores de punto flotante
 o una expressión de lambda para especificar
 el argumento [b]{main_app.get_txt_(self.alias_name)}[/b].
@@ -127,7 +127,7 @@ el Color 2 es representado por 'flow_path_ink',
 el Color 3 como 'selected_item_ink' y
 el Color 4 como 'unselected_item_ink'.""",
 #----------------------------------
-"help_flow#shader_filename": """\
+"help_flow#edit_shader_arg:filename": """\
 introduzca la ruta del fichero del
 shader que quieres arrancar o puntea
 el botón [b]...[/b] a la izquierda para
