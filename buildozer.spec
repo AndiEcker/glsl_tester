@@ -21,7 +21,7 @@ source.dir = .
 #source.include_patterns = assets/*,images/*.png
 #source.include_patterns = img/*.jpg
 # ae: the next line only works for included file extensions (source.include_exts has higher priority)!!!
-#source.include_patterns = ae_updater_moves/*.ini,ae_updater_overwrites/**
+#source.include_patterns = ae_updater_copies/**, ae_updater_moves/*.ini, ae_updater_overwrites/**
 
 # (list) Source files to exclude (let empty to not exclude anything)
 source.exclude_exts = md,log
@@ -42,7 +42,7 @@ version.regex = __version__ = ['"](.*)['"]
 version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
-requirements = android, hostpython3==3.7.5, python3==3.7.5, kivy==2.0.0, plyer, qrcode, kivy_garden.qrcode,
+requirements = android, hostpython3==3.7.5, python3==3.7.5, kivy==master, plyer, qrcode, kivy_garden.qrcode,
     ae.base, ae.files, ae.paths, ae.deep, ae.droid, ae.inspector, ae.i18n, ae.updater, ae.core, ae.literal, ae.console,
     ae.parse_date, ae.gui_app, ae.gui_help, ae.kivy_auto_width, ae.kivy_dyn_chi, ae.kivy_help, ae.kivy_relief_canvas,
     ae.kivy_app, ae.kivy_user_prefs, ae.kivy_glsl,

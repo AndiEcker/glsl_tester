@@ -9,7 +9,7 @@ signale zu unterdrücken.
 
 aktuelle lautstärke: [b]{round(self.value * 100)}[/b]%
 
-als 'lambda: main_app.sound_volume'
+als 'lambda: gt_app.sound_volume'
 ausdruck (oder kurz 's') zum
 dynamischen ändern von shader
 argumenten verwendbar.""",
@@ -23,17 +23,18 @@ zu unterdrücken.
 
 aktuelle vibration: [b]{round(self.value * 100)}[/b]%
 
-als 'lambda: main_app.vibration_volume'
+als 'lambda: gt_app.vibration_volume'
 ausdruck (oder kurz 'v') zum dynamischen
 ändern von shader argumenten verwendbar.""",
 #----------------------------------
+#---- OVERWRITING ae.gui_help -----
 "help_app_state#render_frequency": """\
 animations-frequenz des shader-zeitgebers.
 
 aktuelle frequenz: [b]{round(self.value)}[/b]Hz
 
 schiebe den regler ganz nach links um den
-shader-zeitgeber zu deativieren und um
+shader-zeitgeber zu deaktivieren und um
 den [b]tick[/b]-knopf anzuzeigen, mit dem
 die shader-animation manuel um eine
 zeit-einheit weiterbewegt werden kann.""",
@@ -68,8 +69,8 @@ doppelter breite angezeigt.{'''
 ausgewählt)''' if main_app.shaders_idx == int(self.text.split('==')[0]) else ""}""",
 #----------------------------------
 "help_flow#edit_shader_arg:alpha": """\
-gebe einen numerischen wert zwischen '0.0'
-und '1.0' für das [b]{main_app.get_txt_(self.alias_name)}[/b]
+gebe einen numerischen wert zwischen 0.0
+und 1.0 für das [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument ein. Dieser wert beeinflusst
 die transparenz der shader-ausgabe.
 
@@ -77,32 +78,32 @@ um diesen wert beim start eines shaders zu
 setzen kann einer der schieberegler im
 zahnrad-menü verwendet werden: der wert des
 lautstärke-regler entspricht z.B. dem
-ausdruck 'main_app.sound_volume', und
-'main_app.vibration_volume' entspricht der
+ausdruck 'gt_app.sound_volume', und
+'gt_app.vibration_volume' entspricht der
 aktuellen vibrations-intensität.
 
 mit der zeichenkette 'lambda: ' am
 anfang kann der wert auch im laufenden
 shader dynamisch geändert werden. Die
-eingabe 'lambda: main_app.sound_volume'
+eingabe 'lambda: gt_app.sound_volume'
 oder kurz 's' macht z.B. den lautstärke-
 regler zum dynamischen shader-eingabe-wert
 (die vibrations-intensität via 'v').""",
 #----------------------------------
 "help_flow#edit_shader_arg:center_pos": """\
-gebe zwei komma-werte (z.B. '100.0, 200.0')
-oder einen lambda-ausdruck für das
-[b]{main_app.get_txt_(self.alias_name)}[/b] shader argument ein.
+gebe zwei komma-werte (z.B. '100.0, 200.0') oder
+einen lambda-ausdruck für das shader argument
+[b]{main_app.get_txt_(self.alias_name)}[/b] ein.
 
-die meisten shader nutzen dieses
-argument als zentrale bildschirm-
-position (x,y) der animation.
+lambda-ausdrücke wie 'lambda: gt_app.last_touch'
+(kurz 'L'), 'lambda: gt_app.mouse_pos' (kurz 'M'),
+oder 'C' (für die zentral-position des render
+widgets) aktualisieren dieses argument dynamisch.
 
-die ausdrücke 'main_app.last_touch'
-(kurz 'T') oder 'main_app.mouse_pos'
-(kurz 'M') können verwendet werden um
-dieses shader argument dynamisch - im
-laufenden shader - zu ändern.""",
+der folgende lambda-ausdruck kombiniert z.B. den
+zeitgeber ('T') mit 'C' um die zentral-position
+des laufenden shaders dynamisch kreisen zu lassen:
+'lambda: (C()[0]+sin(T())*90,C()[1]-cos(T())*60)'""",
 #----------------------------------
 "help_flow#edit_shader_arg:contrast": """\
 gebe einen numerischen komma-wert
@@ -125,14 +126,11 @@ zu setzen.""",
 als komma-wert oder einen lambda-ausdruck.
 
 ein komma-wert bewirkt einen versatz zum
-shader-zeitgeber. '0.0' synchronisiert den
-shader-zeitgeber.
+shader-zeitgeber. 0.0 synchronisiert den
+shader-zeitgeber. bei einem lambda-ausdruck
+wie 'lambda: T() * 2.0' läuft er rückwärts.
 
-bei eingabe eines lambda-ausdruck wie z.b.
-'lambda: c() * 2.0' läuft die animation
-des shaders rückwärts.
-
-'c' repräsentiert den wert des laufenden
+'T' repräsentiert den wert des laufenden
 zeitgebers (Clock.get_boottime()).""",
 #----------------------------------
 "help_flow#edit_shader_arg:tex_col_mix": """\
@@ -150,20 +148,19 @@ und alpha) zwischen 0.0 and 1.0.
 verwende eine der farben des zahnrad-
 menüs. Die mit 'Farbe 1' bezeichnete
 farbe entspricht dabei dem ausdruck
-'main_app.flow_id_ink'.
-'Farbe 2' entspricht 'main_app.flow_path_ink',
-'Farbe 3' 'main_app.selected_item_ink' und
-'Farbe 4' 'main_app.unselected_item_ink'.
+'gt_app.flow_id_ink'.
+'Farbe 2' entspricht 'gt_app.flow_path_ink',
+'Farbe 3' 'gt_app.selected_item_ink' und
+'Farbe 4' 'gt_app.unselected_item_ink'.
 
 zur dynamischen änderung im laufenden shader
 stelle dem eingegebenen ausdruck die
 zeichenfolge 'lambda: ' voraus.""",
 #----------------------------------
-"help_flow#edit_shader_arg:filename": """\
+"help_flow#edit_shader_arg:shader_filename": """\
 pfad der shader-datei eingeben oder
-auf die [b]...[/b]-schaltfläche links
-daneben tippen um eine shader-datei
-auszuwählen.""",
+auf den [b]...[/b]-knopf links daneben
+tippen um eine datei auszuwählen.""",
 #----------------------------------
 "help_flow#next_render_tick": """\
 die shader-animation manuell auf
@@ -176,31 +173,86 @@ deaktiviertem shader-zeitgeber)""",
 fenster zur eingabe und bearbeitung
 der shader argumente {'öffnen' if self.state == 'down' else 'schließen'}.""",
 #==================================
-#---- OVERWRITING ae.gui_help -----
-"flow_id_ink": "farbe 1{' (main_app.flow_id_ink)' if app.landscape else ''}",
-"flow_path_ink": "farbe 2{' (main_app.flow_path_ink)' if app.landscape else ''}",
-"selected_item_ink": "farbe 3{' (main_app.selected_item_ink)' if app.landscape else ''}",
-"unselected_item_ink": "farbe 4{' (main_app.unselected_item_ink)' if app.landscape else ''}",
+'tour_page#gt_screen_layout':
+    {'fade_out_app': 0.111,
+     'page_text': """\
+teste glsl shader-dateien mit dynamischen argumenten.
+
+oben werden shader-dateien und argumente angegeben.
+die shader-ausgabe füllt den rest dieses fensters.""", },
 #----------------------------------
-"shader {self.shaders_idx} error(s)":
-    """{str(count) + " " if count > 1 else ""}fehler in shader {self.shaders_idx}""",
+'tour_page#gt_choose_shader_file':
+    {'page_text': "shader-datei wählen",
+     'tip_text': "=edit_shader_arg:shader_filename", },
+#----------------------------------
+'tour_page#gt_run_pause_shader':
+    {'page_text': "shader starten/pausieren",
+     'tip_text': """\
+dieser knopf startet/pausiert den zur
+bearbeitung ausgewählten shader.""", },
+#----------------------------------
+'tour_page#gt_enter_shader_args':
+    {'fade_out_app': 0.3,
+     'page_text': """\
+die argumente der [b]uniform[/b]-parameter der
+gewählten shader-datei werden in den nun
+hervorgehobenen eingabe-feldern angegeben.""", },
+#----------------------------------
+'tour_page#gt_pos_shader_arg':
+    {'fade_out_app': 0.21,
+     'page_text': "dynamische zentral-position",
+     'tip_text': "=edit_shader_arg:center_pos", },
+#----------------------------------
+'tour_page#gt_shader_slots':
+    {'page_text': "shader wählen",
+     'tip_text': """\
+jeder dieser ovalen knöpfe repräsentiert einen
+shader. ein tip auf einen der knöpfe wählt den
+shader aus, um die zugehörigen shader-argumente
+anzuzeigen und zu ändern.
+
+der status jedes shaders ist im knopf-text nach
+den beiden [b]==[/b]-zeichen zu sehen.""", },
+#----------------------------------
+'tour_page#gt_add_del_shader':
+    {'fade_out_app': 0.6,
+     'page_text': "shader hinzufügen/löschen",
+     'tip_text': """\
+der knopf des gerade gewählte shaders wird in doppelter
+breite angezeigt. mit dem [b]+[/b]-knopf links wird er
+dupliziert. mit dem knopf darunter wird er gelöscht.""", },
+#----------------------------------
+'tour_page#gt_multiple_shaders':
+    {'fade_out_app': 0.0,
+     'tip_text': """\
+setze zur kombination mehrerer shader (hier 3) die
+[b]opazität[/b] argumente auf werte kleiner als 1.0.""", },
+#==================================
+#---- OVERWRITING ae.gui_help -----
+"flow_id_ink": "farbe 1{' (gt_app.flow_id_ink)' if app.landscape else ''}",
+"flow_path_ink": "farbe 2{' (gt_app.flow_path_ink)' if app.landscape else ''}",
+"selected_item_ink": "farbe 3{' (gt_app.selected_item_ink)' if app.landscape else ''}",
+"unselected_item_ink": "farbe 4{' (gt_app.unselected_item_ink)' if app.landscape else ''}",
+#----------------------------------
 "alpha": "opazität",
 "animation exception - stopped timer": "animationsfehler - zeitgeber angehalten",
 "center_pos": "zentral-pos.",
 "contrast": "kontrast",
 "empty shader code file {shader_filename}": "shader-datei {shader_filename} ist leer",
 "{file_path} is not a shader file": "{file_path} ist keine shader-datei",
-"invalid expression '{arg_inp}' in shader argument [b]{main_app.get_txt_(arg_name)}[/b]":
-    "der ausdruck '{arg_inp}' der input variable [b]{main_app.get_txt_(arg_name)}[/b] ist fehlerhaft",
-"missing shader argument app state [b]{main_app.get_txt_(arg_name)}[/b]":
-    "shader parameter [b]{main_app.get_txt_(arg_name)}[/b] ist ungültig",
+"invalid expression '{arg_inp}' in shader argument [b]{gt_app.get_txt_(arg_name)}[/b]":
+    "der ausdruck '{arg_inp}' der input variable [b]{gt_app.get_txt_(arg_name)}[/b] ist fehlerhaft",
+"missing shader argument app state [b]{gt_app.get_txt_(arg_name)}[/b]":
+    "shader parameter [b]{gt_app.get_txt_(arg_name)}[/b] ist ungültig",
 "mouse": "maus-pos.",
 "no vertex/fragment sections in shader {shader_filename}":
     "vertex/fragment abschnitte fehlen im shader {shader_filename}",
-"paused": "gestoppt",
-"run": "lauf",
+"paused": "pausiert",
+"run": "start",
 "running": "läuft",
 "shader compilation/start failed: {ex}": "shader-start-fehler: {ex}",
+"shader {self.shaders_idx} error(s)":
+    """{str(count) + " " if count > 1 else ""}fehler in shader {self.shaders_idx}""",
 "shader file {shader_filename} not found": "shader-datei {shader_filename} existiert nicht",
 "tint_ink": "farbe",
 }

@@ -6,9 +6,9 @@ volumen de sonidos
 
 para silenciar los sonidos puntea a la izquierda.
 
-volumen actual: {round(self.value * 100)}%
+volumen actual: [b]{round(self.value * 100)}[/b]%
 
-usa la expression 'lambda: main_app.sound_volume'
+usa la expression 'lambda: gt_app.sound_volume'
 (o 's') para cambiar un argumento del shader
 dinamicamente.""",
 #----------------------------------
@@ -18,16 +18,17 @@ intensidad vibración
 
 para silenciar los vibraciones puntea a la izquierda.
 
-vibración actual: {round(self.value * 100)}%
+vibración actual: [b]{round(self.value * 100)}[/b]%
 
-usa la expression 'lambda: main_app.vibration_volume'
+usa la expression 'lambda: gt_app.vibration_volume'
 para cambiar un argumento de un shader dinamicamente.""",
-#==================================
+#----------------------------------
+#---- OVERWRITING ae.gui_help -----
 "help_app_state#render_frequency": """\
 ajustar la frequencia de la animación
 del shader.
 
-current frequency: {round(self.value)}Hz
+current frequency: [b]{round(self.value)}[/b]Hz
 
 moviendolo hacia la izquierda, la
 animación automatica se desactivará
@@ -71,7 +72,7 @@ mayoria de los shaders como opacidad.
 para ajustar ese valor dinamicamente por un
 shader arrancado, introduce lo como una
 expressión lambda, como por ejemplo
-'lambda: main_app.sound_volume' o 's' para
+'lambda: gt_app.sound_volume' o 's' para
 usar el deslizador del volumen ('v' para
 aquel de la intensidad de vibración).""",
 #----------------------------------
@@ -84,7 +85,7 @@ la mayoria de los shaders usa este valor
 como posición central (x,y) de la animación.
 
 también se puede usar por ejemplo la
-expresión 'main_app.last_touch' or 'L'.""",
+expresión 'gt_app.last_touch' or 'L'.""",
 #----------------------------------
 "help_flow#edit_shader_arg:contrast": """\
 introduzca un valor de punto flotante o
@@ -103,9 +104,8 @@ introduzca un valor de punto flotante o una
 expresión lambda para especificar el argumento
 [b]{main_app.get_txt_(self.alias_name)}[/b] del shader.
 
-introduzca '0.0' para sincronizar los shaders,
-o un lambda e.g. con 'c()' para cambiar la
-velocidad de la animación del shader.""",
+por ejemplo '0.0' para sincronizar los shaders, o
+'lambda: T() * 2.0' para reproducir hacia atrás.""",
 #----------------------------------
 "help_flow#edit_shader_arg:tex_col_mix": """\
 introduzca un valor de punto flotante o
@@ -121,13 +121,13 @@ el argumento [b]{main_app.get_txt_(self.alias_name)}[/b].
 usa una de los color del menu de los
 preferencias de usuario, por ejemplo el
 Color 1 en una expresión de lambda como
-'lambda: main_app.flow_id_ink'.
+'lambda: gt_app.flow_id_ink'.
 
 el Color 2 es representado por 'flow_path_ink',
 el Color 3 como 'selected_item_ink' y
 el Color 4 como 'unselected_item_ink'.""",
 #----------------------------------
-"help_flow#edit_shader_arg:filename": """\
+"help_flow#edit_shader_arg:shader_filename": """\
 introduzca la ruta del fichero del
 shader que quieres arrancar o puntea
 el botón [b]...[/b] a la izquierda para
@@ -141,25 +141,76 @@ del shader por un 'tick'.""",
 {'abre' if self.state == 'down' else 'cierre'} la ventanita de los
 argumentos del shader.""",
 #==================================
-#---- OVERWRITING ae.gui_help -----
-"flow_id_ink": "Color 1{' (main_app.flow_id_ink)' if app.landscape else ''}",
-"flow_path_ink": "Color 2{' (main_app.flow_path_ink)' if app.landscape else ''}",
-"selected_item_ink": "Color 3{' (main_app.selected_item_ink)' if app.landscape else ''}",
-"unselected_item_ink": "Color 4{' (main_app.unselected_item_ink)' if app.landscape else ''}",
+'tour_page#gt_screen_layout':
+    {'fade_out_app': 0.111,
+     'page_text': """\
+testear ficheros de glsl con argumentos dinamicos.
+
+introduzca el fichero y los argumentos en el parte
+de arriba. el resto de la ventana rellena el shader.""", },
 #----------------------------------
-"shader {self.shaders_idx} error(s)":
-    {'one': "error en el shader {self.shaders_idx}",
-     'many': "{count} errores en el shader {self.shaders_idx}"},
+'tour_page#gt_choose_shader_file':
+    {'page_text': "seleccionar fichero",
+     'tip_text': "=edit_shader_arg:shader_filename", },
+#----------------------------------
+'tour_page#gt_run_pause_shader':
+    {'page_text': "arrancar/detener shader",
+     'tip_text': """\
+ese botón arranca/detiene
+el shader seleccionado.""", },
+#----------------------------------
+'tour_page#gt_enter_shader_args':
+    {'fade_out_app': 0.3,
+     'page_text': """\
+los argumentos del los parametros [b]uniform[/b]
+del fichero glsl seleccionado se muestran en
+estos campos de entrada.""", },
+#----------------------------------
+'tour_page#gt_pos_shader_arg':
+    {'fade_out_app': 0.21,
+     'page_text': "posición central dinamico",
+     'tip_text': "=edit_shader_arg:center_pos", },
+#----------------------------------
+'tour_page#gt_shader_slots':
+    {'page_text': "seleccionar shader",
+     'tip_text': """\
+cada uno de estos botones redondas representa
+un shader. tapea para seleccionar uno, para
+mostrar o editar sus argumentos.
+
+el estado de cada shader se muestra en el texto
+del botón despues del los characteres [b]==[/b].""", },
+#----------------------------------
+'tour_page#gt_add_del_shader':
+    {'fade_out_app': 0.6,
+     'page_text': "añadir/borrar shader",
+     'tip_text': """\
+el botón del shader seleccionado se muestra en ancho
+doble. duplicar el shader seleccionado con el botón
+[b]+[/b] a la izquierda. borrarlo con el botón debajo.""", },
+#----------------------------------
+'tour_page#gt_multiple_shaders':
+    {'fade_out_app': 0.0,
+     'tip_text': """\
+para la combinación de multiples shaders hay que poner
+el argumento de la opacidad a un valor menos de 1.0.""", },
+#==================================
+#---- OVERWRITING ae.gui_help -----
+"flow_id_ink": "Color 1{' (gt_app.flow_id_ink)' if app.landscape else ''}",
+"flow_path_ink": "Color 2{' (gt_app.flow_path_ink)' if app.landscape else ''}",
+"selected_item_ink": "Color 3{' (gt_app.selected_item_ink)' if app.landscape else ''}",
+"unselected_item_ink": "Color 4{' (gt_app.unselected_item_ink)' if app.landscape else ''}",
+#----------------------------------
 "alpha": "opacidad",
 "animation exception - stopped timer": "error de animación - temporizador suspendido",
 "center_pos": "pos. central",
 "contrast": "contraste",
 "empty shader code file {shader_filename}": "fichero de shader {shader_filename} es vacio",
 "{file_path} is not a shader file": "{file_path} no es un fichero de código de shader",
-"invalid expression '{arg_inp}' in shader argument [b]{main_app.get_txt_(arg_name)}[/b]":
-    "la expresión de '{arg_inp}' del argumento [b]{main_app.get_txt_(arg_name)}[/b] no es válida",
-"missing shader argument app state [b]{main_app.get_txt_(arg_name)}[/b]'":
-    "el valor del argumento [b]{main_app.get_txt_(arg_name)}[/b] no existe",
+"invalid expression '{arg_inp}' in shader argument [b]{gt_app.get_txt_(arg_name)}[/b]":
+    "la expresión de '{arg_inp}' del argumento [b]{gt_app.get_txt_(arg_name)}[/b] no es válida",
+"missing shader argument app state [b]{gt_app.get_txt_(arg_name)}[/b]'":
+    "el valor del argumento [b]{gt_app.get_txt_(arg_name)}[/b] no existe",
 "mouse": "pos. ratón",
 "no vertex/fragment sections in shader {shader_filename}":
     "faltan los secciones de vertex/fragment en {shader_filename}",
@@ -167,6 +218,9 @@ argumentos del shader.""",
 "run": "va",
 "running": "corre",
 "shader compilation/start failed: {ex}": "error '{ex}' en arrancar el shader",
+"shader {self.shaders_idx} error(s)":
+    {'one': "error en el shader {self.shaders_idx}",
+     'many': "{count} errores en el shader {self.shaders_idx}"},
 "shader file {shader_filename} not found": "el fichero de shader {shader_filename} no existe",
 "tint_ink": "color",
 }

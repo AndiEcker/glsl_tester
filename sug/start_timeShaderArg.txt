@@ -1,6 +1,6 @@
-c
+T
 None
 0.0
-Clock.get_boottime()
--Clock.get_boottime() / 3.0
-lambda: Clock.get_boottime()
+lambda: T() * 3.0
+lambda: -T()
+lambda: M()[0]

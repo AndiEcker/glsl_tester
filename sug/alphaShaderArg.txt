@@ -2,11 +2,9 @@ lambda: e()[0]
 lambda: i()[0]
 lambda: l()[0]
 lambda: m()[0]
-k
 s
 v
-main_app.sound_volume
-main_app.vibration_volume
+gt_app.render_frequency
 1.0
 0.9
 0.6

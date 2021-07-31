@@ -1,10 +1,14 @@
-lambda: main_app.flow_id_ink
-lambda: main_app.flow_path_ink
-lambda: main_app.unselected_item_ink
-lambda: main_app.selected_item_ink
+lambda: gt_app.flow_id_ink
+lambda: gt_app.flow_path_ink
+lambda: gt_app.unselected_item_ink
+lambda: gt_app.selected_item_ink
 lambda: e() + i()
-lambda: h() + h_1()
+lambda: h1() + h2()
 lambda: l() + m()
 lambda: 1.0 - l()[0], 1.0 - l()[1], 0.3 + 0.69 * l()[1], 0.3 + 0.69 * l()[0]
+lambda: (0.3 + (T() % 9) * 0.06, 1.0, 1.0, 1.0)
+lambda: (1,0, 0.69 + sin(T()) * 0.3, 1.0, 1.0)
+lambda: (1.0, 1.0, 1.0 - T() % 0.69, 1.0)
+lambda: (0.3 + (T() % 9) * 0.06, 0.69 + sin(T()) * 0.3, 1.0 - T() % 0.69, 1.0)
 0.0, 0.0, 0.0, 1.0
 1.0, 1.0, 1.0, 1.0

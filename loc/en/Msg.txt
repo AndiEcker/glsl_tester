@@ -8,7 +8,7 @@ tap all to the left to mute sounds.
 
 current value: [b]{round(self.value * 100)}[/b]%
 
-Use 'lambda: main_app.sound_volume'
+use 'lambda: gt_app.sound_volume'
 expression (or short 's') to
 dynamically change a shader argument.""",
 #----------------------------------
@@ -21,7 +21,7 @@ vibrations.
 
 current vibration: [b]{round(self.value * 100)}[/b]%
 
-Use 'lambda: main_app.vibration_volume'
+use 'lambda: gt_app.vibration_volume'
 expression to dynamically change
 a shader argument.""",
 #----------------------------------
@@ -32,7 +32,7 @@ shader ticker.
 
 current frequency: [b]{round(self.value)}[/b]Hz
 
-By moving the slider all to the left the
+by moving the slider all to the left the
 shader ticker will be disabled and a
 'tick' button will appear to manually
 advance the shader animation.""",
@@ -77,7 +77,7 @@ most shaders as opacity.
 To change this value dynamically
 on a running shader specify a
 lambda expression like e.g.
-'lambda: main_app.sound_volume'
+'lambda: gt_app.sound_volume'
 (or short 's').""",
 #----------------------------------
 "help_flow#edit_shader_arg:center_pos": """\
@@ -88,8 +88,8 @@ argument [b]{main_app.get_txt_(self.alias_name)}[/b].
 Most shaders use this value as center
 position (x,y) for the shader animation.
 
-the expressions 'main_app.last_touch'
-(short 'L') or 'main_app.mouse_pos'
+the expressions 'gt_app.last_touch'
+(short 'L') or 'gt_app.mouse_pos'
 (short 'M') can be used to dynamically
 set this shader argument of a running
 shader to the last touch/mouse position.""",
@@ -108,24 +108,25 @@ set the [b]{main_app.get_txt_(self.alias_name)}[/b]
 shader argument.""",
 #----------------------------------
 "help_flow#edit_shader_arg:start_time": """\
-enter either a float value or a lambda
+enter either a float value, or a lambda
 expression in this shader argument
 [b]{main_app.get_txt_(self.alias_name)}[/b].
 
-entering '0.0' will synchronize the
+entering 0.0 will synchronize the
 shader with the render tick/clock.
 
-the lambda expression 'lambda: c() * 2.0'
-will run the shader animation reversed.""",
+e.g. to run shader animation reversed
+reversed enter the lambda expression
+'lambda: T() * 2.0'. T represents the
+tick/clock value (Clock.get_boottime).""",
 #----------------------------------
 "help_flow#edit_shader_arg:tex_col_mix": """\
-enter a float value or
-a lambda expression to
-set the [b]{main_app.get_txt_(self.alias_name)}[/b]
-shader argument.""",
+enter either a float value, or
+a lambda expression to control the
+[b]{main_app.get_txt_(self.alias_name)}[/b] argument.""",
 #----------------------------------
 "help_flow#edit_shader_arg:tint_ink": """\
-enter a tuple of four float values or a
+enter a tuple of four float values, or a
 lambda expression to specify the shader
 argument [b]{main_app.get_txt_(self.alias_name)}[/b].
 
@@ -133,13 +134,13 @@ Use one of the user preference colors in
 a lambda expression to dynamically change
 the color of a running shader, e.g. to use
 the Color 1 enter the lambda expression
-'lambda: main_app.flow_id_ink'.
+'lambda: gt_app.flow_id_ink'.
 
 Color 2 get represented by 'flow_path_ink',
-Color 3 by 'selected_item_ink' and
-Color 4 by 'unselected_item_ink'.""",
+Color 3 by 'gt_app.selected_item_ink' and
+Color 4 by 'gt_app.unselected_item_ink'.""",
 #----------------------------------
-"help_flow#edit_shader_arg:filename": """\
+"help_flow#edit_shader_arg:shader_filename": """\
 enter the path of the
 shader code file or tap
 on the [b]...[/b] button on
@@ -154,9 +155,63 @@ time by one tick/frame.""",
 {'open' if self.state == 'down' else 'close'} the tool box to modify
 the shader arguments.""",
 #==================================
+'tour_page#gt_screen_layout':
+    {'fade_out_app': 0.111,
+     'page_text': """\
+test glsl shader-file with dynamic arguments.
+
+shader-file and -arguments are at the top. the
+shader-output fills the rest of this window.""", },
+#----------------------------------
+'tour_page#gt_choose_shader_file':
+    {'page_text': "choosing shader-file",
+     'tip_text': "=edit_shader_arg:shader_filename", },
+#----------------------------------
+'tour_page#gt_run_pause_shader':
+    {'page_text': "start/pause shader",
+     'tip_text': """\
+this button is starting/pausing
+the currently selected shader.""", },
+#----------------------------------
+'tour_page#gt_enter_shader_args':
+    {'fade_out_app': 0.3,
+     'page_text': """\
+the arguments of [b]uniform[/b]-parameters
+of the selected shader-file can be set via
+the targeted/highlighted entry fields.""", },
+#----------------------------------
+'tour_page#gt_pos_shader_arg':
+    {'fade_out_app': 0.21,
+     'page_text': "dynamic center-position",
+     'tip_text': "=edit_shader_arg:center_pos", },
+#----------------------------------
+'tour_page#gt_shader_slots':
+    {'page_text': "select shader",
+     'tip_text': """\
+each of these oval buttons represents a shader.
+tap to select the shader, to display or change
+the shader arguments or run status.
+
+the run status of each shader gets displayed in
+the button text after the [b]==[/b]-characters.""", },
+#----------------------------------
+'tour_page#gt_add_del_shader':
+    {'fade_out_app': 0.6,
+     'page_text': "add/remove shader",
+     'tip_text': """\
+the currently selected shader has a button with the double
+width. clone it by tapping on the [b]+[/b]-button to the
+left, or remove it with the button underneath.""", },
+#----------------------------------
+'tour_page#gt_multiple_shaders':
+    {'fade_out_app': 0.0,
+     'tip_text': """\
+to combine multiple shaders, the alpha or
+opacity argument has to be less than 1.0.""", },
+#==================================
 #---- OVERWRITING ae.gui_help -----
-"flow_id_ink": "color 1{' (main_app.flow_id_ink)' if app.landscape else ''}",
-"flow_path_ink": "color 2{' (main_app.flow_path_ink)' if app.landscape else ''}",
-"selected_item_ink": "color 3{' (main_app.selected_item_ink)' if app.landscape else ''}",
-"unselected_item_ink": "color 4{' (main_app.unselected_item_ink)' if app.landscape else ''}",
+"flow_id_ink": "color 1{' (gt_app.flow_id_ink)' if app.landscape else ''}",
+"flow_path_ink": "color 2{' (gt_app.flow_path_ink)' if app.landscape else ''}",
+"selected_item_ink": "color 3{' (gt_app.selected_item_ink)' if app.landscape else ''}",
+"unselected_item_ink": "color 4{' (gt_app.unselected_item_ink)' if app.landscape else ''}",
 }
