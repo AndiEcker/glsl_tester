@@ -1,9 +1,9 @@
+uniform float speed;
+uniform float zoom;
+
 uniform float time;
-uniform vec2 mouse;
 uniform vec2 resolution;
 
-const float cloudscale = 1.1;
-const float speed = 0.01;
 const float clouddark = 0.5;
 const float cloudlight = 0.3;
 const float cloudcover = 0.2;
@@ -48,11 +48,11 @@ void main(void) {
     vec2 p = gl_FragCoord.xy / resolution.xy;
 	vec2 uv = p*vec2(resolution.x/resolution.y,1.0);    
     float time_ = time * speed;
-    float q = fbm(uv * cloudscale * 0.5);
+    float q = fbm(uv * zoom * 0.5);
     
     //ridged noise shape
 	float r = 0.0;
-	uv *= cloudscale;
+	uv *= zoom;
     uv -= q - time_;
     float weight = 0.8;
     for (int i=0; i<8; i++){
@@ -64,7 +64,7 @@ void main(void) {
     //noise shape
 	float f = 0.0;
     uv = p*vec2(resolution.x/resolution.y,1.0);
-	uv *= cloudscale;
+	uv *= zoom;
     uv -= q - time_;
     weight = 0.7;
     for (int i=0; i<8; i++){
@@ -79,7 +79,7 @@ void main(void) {
     float c = 0.0;
     time_ = time_ * speed * 2.0;
     uv = p*vec2(resolution.x/resolution.y,1.0);
-	uv *= cloudscale*2.0;
+	uv *= zoom*2.0;
     uv -= q - time_;
     weight = 0.4;
     for (int i=0; i<7; i++){
@@ -92,7 +92,7 @@ void main(void) {
     float c1 = 0.0;
     time_ = time_ * speed * 3.0;
     uv = p*vec2(resolution.x/resolution.y,1.0);
-	uv *= cloudscale*3.0;
+	uv *= zoom*3.0;
     uv -= q - time_;
     weight = 0.4;
     for (int i=0; i<7; i++){

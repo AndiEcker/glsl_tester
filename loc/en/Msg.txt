@@ -51,7 +51,7 @@ load the other file for
 the shader [b]{main_app.shaders_idx}[/b].""",
 #----------------------------------
 "help_flow#run_shader": """\
-{"stop" if main_app.shaders_args[main_app.shaders_idx]['run_state'] == 'running' else "run"} the
+{"pause" if main_app.shaders_args[main_app.shaders_idx]['run_state'] == 'running' else "run"} the
 shader [b]{main_app.shaders_idx}[/b].""",
 #----------------------------------
 "help_flow#sel_shader": """\
@@ -115,10 +115,10 @@ expression in this shader argument
 entering 0.0 will synchronize the
 shader with the render tick/clock.
 
-e.g. to run shader animation reversed
-reversed enter the lambda expression
-'lambda: T() * 2.0'. T represents the
-tick/clock value (Clock.get_boottime).""",
+to run shader animation reversed enter
+the lambda expression 'lambda: T()*2.0'.
+T represents here the render tick/clock
+(Clock.get_boottime).""",
 #----------------------------------
 "help_flow#edit_shader_arg:tex_col_mix": """\
 enter either a float value, or
@@ -158,10 +158,13 @@ the shader arguments.""",
 'tour_page#gt_screen_layout':
     {'fade_out_app': 0.111,
      'page_text': """\
-test glsl shader-file with dynamic arguments.
+test glsl shader-files with
+dynamic arguments.
 
-shader-file and -arguments are at the top. the
-shader-output fills the rest of this window.""", },
+shader-file and -arguments are
+specified at the top. the rest
+of this window displays the
+output of the shaders.""", },
 #----------------------------------
 'tour_page#gt_choose_shader_file':
     {'page_text': "choosing shader-file",
@@ -214,4 +217,8 @@ opacity argument has to be less than 1.0.""", },
 "flow_path_ink": "color 2{' (gt_app.flow_path_ink)' if app.landscape else ''}",
 "selected_item_ink": "color 3{' (gt_app.selected_item_ink)' if app.landscape else ''}",
 "unselected_item_ink": "color 4{' (gt_app.unselected_item_ink)' if app.landscape else ''}",
+#----------------------------------
+"shader {self.shaders_idx} error(s)":
+    {'one': "error in shader {self.shaders_idx}",
+     'many': "{count} errors in shader {self.shaders_idx}", },
 }

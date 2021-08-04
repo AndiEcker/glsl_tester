@@ -17,7 +17,7 @@ void main( void ) {
  vec2 xy = (gl_FragCoord.xy - win_pos - center_pos) / resolution.yy;
  vec2 uv = vec2(atan(xy.y , xy.x) * 4.000000001 / TAU, log(length(xy)) * (0.21 + mouse.y / resolution.y) - time / 20.1);
  vec2 p = mod(uv*TAU, TAU)-270.0;
- float c = 10.2 - 3.0 * contrast;
+ float c = 7.2 - 6.0 * contrast;
  float intensity = 0.0015 + mouse.x / resolution.x / 333.3;  //.0042;
 
  vec2 i = p;

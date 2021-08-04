@@ -238,12 +238,12 @@ setze zur kombination mehrerer shader (hier 3) die
 "animation exception - stopped timer": "animationsfehler - zeitgeber angehalten",
 "center_pos": "zentral-pos.",
 "contrast": "kontrast",
+"empty shader argument [b]{gt_app.get_txt_(alias_name)}[/b]":
+    "shader parameter [b]{gt_app.get_txt_(alias_name)}[/b] ist leer",
 "empty shader code file {shader_filename}": "shader-datei {shader_filename} ist leer",
 "{file_path} is not a shader file": "{file_path} ist keine shader-datei",
-"invalid expression '{arg_inp}' in shader argument [b]{gt_app.get_txt_(arg_name)}[/b]":
-    "der ausdruck '{arg_inp}' der input variable [b]{gt_app.get_txt_(arg_name)}[/b] ist fehlerhaft",
-"missing shader argument app state [b]{gt_app.get_txt_(arg_name)}[/b]":
-    "shader parameter [b]{gt_app.get_txt_(arg_name)}[/b] ist ungültig",
+"invalid expression '{arg_inp}' in shader argument [b]{gt_app.get_txt_(alias_name)}[/b]":
+    "der ausdruck '{arg_inp}' der input variable [b]{gt_app.get_txt_(alias_name)}[/b] ist fehlerhaft",
 "mouse": "maus-pos.",
 "no vertex/fragment sections in shader {shader_filename}":
     "vertex/fragment abschnitte fehlen im shader {shader_filename}",
@@ -254,5 +254,6 @@ setze zur kombination mehrerer shader (hier 3) die
 "shader {self.shaders_idx} error(s)":
     """{str(count) + " " if count > 1 else ""}fehler in shader {self.shaders_idx}""",
 "shader file {shader_filename} not found": "shader-datei {shader_filename} existiert nicht",
+"shader_filename": "shader-datei",
 "tint_ink": "farbe",
 }

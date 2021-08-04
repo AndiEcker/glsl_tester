@@ -144,10 +144,13 @@ argumentos del shader.""",
 'tour_page#gt_screen_layout':
     {'fade_out_app': 0.111,
      'page_text': """\
-testear ficheros de glsl con argumentos dinamicos.
+testear ficheros de shader glsl
+con argumentos dinámicos.
 
-introduzca el fichero y los argumentos en el parte
-de arriba. el resto de la ventana rellena el shader.""", },
+introduzca el fichero y los
+argumentos en el parte de arriba
+de la ventana; en el resto de la
+ventana rellena el shader.""", },
 #----------------------------------
 'tour_page#gt_choose_shader_file':
     {'page_text': "seleccionar fichero",
@@ -162,32 +165,32 @@ el shader seleccionado.""", },
 'tour_page#gt_enter_shader_args':
     {'fade_out_app': 0.3,
      'page_text': """\
-los argumentos del los parametros [b]uniform[/b]
+los argumentos del los parámetros [b]uniform[/b]
 del fichero glsl seleccionado se muestran en
 estos campos de entrada.""", },
 #----------------------------------
 'tour_page#gt_pos_shader_arg':
     {'fade_out_app': 0.21,
-     'page_text': "posición central dinamico",
+     'page_text': "posición central dinámico",
      'tip_text': "=edit_shader_arg:center_pos", },
 #----------------------------------
 'tour_page#gt_shader_slots':
     {'page_text': "seleccionar shader",
      'tip_text': """\
 cada uno de estos botones redondas representa
-un shader. tapea para seleccionar uno, para
+un shader. tocar para seleccionar uno, para
 mostrar o editar sus argumentos.
 
 el estado de cada shader se muestra en el texto
-del botón despues del los characteres [b]==[/b].""", },
+del botón despues del los caracteres [b]==[/b].""", },
 #----------------------------------
 'tour_page#gt_add_del_shader':
     {'fade_out_app': 0.6,
      'page_text': "añadir/borrar shader",
      'tip_text': """\
 el botón del shader seleccionado se muestra en ancho
-doble. duplicar el shader seleccionado con el botón
-[b]+[/b] a la izquierda. borrarlo con el botón debajo.""", },
+doble. duplica el shader seleccionado con el botón [b]+[/b]
+a la izquierda o borrarlo con el otro botón debajo.""", },
 #----------------------------------
 'tour_page#gt_multiple_shaders':
     {'fade_out_app': 0.0,
@@ -205,12 +208,12 @@ el argumento de la opacidad a un valor menos de 1.0.""", },
 "animation exception - stopped timer": "error de animación - temporizador suspendido",
 "center_pos": "pos. central",
 "contrast": "contraste",
+"empty shader argument [b]{gt_app.get_txt_(alias_name)}[/b]'":
+    "el argumento [b]{gt_app.get_txt_(alias_name)}[/b] esta vacio",
 "empty shader code file {shader_filename}": "fichero de shader {shader_filename} es vacio",
-"{file_path} is not a shader file": "{file_path} no es un fichero de código de shader",
-"invalid expression '{arg_inp}' in shader argument [b]{gt_app.get_txt_(arg_name)}[/b]":
-    "la expresión de '{arg_inp}' del argumento [b]{gt_app.get_txt_(arg_name)}[/b] no es válida",
-"missing shader argument app state [b]{gt_app.get_txt_(arg_name)}[/b]'":
-    "el valor del argumento [b]{gt_app.get_txt_(arg_name)}[/b] no existe",
+"{file_path} is not a shader file": "el fichero {file_path} no contiene código de shader",
+"invalid expression '{arg_inp}' in shader argument [b]{gt_app.get_txt_(alias_name)}[/b]":
+    "la expresión de '{arg_inp}' del argumento [b]{gt_app.get_txt_(alias_name)}[/b] no es válida",
 "mouse": "pos. ratón",
 "no vertex/fragment sections in shader {shader_filename}":
     "faltan los secciones de vertex/fragment en {shader_filename}",
@@ -221,6 +224,7 @@ el argumento de la opacidad a un valor menos de 1.0.""", },
 "shader {self.shaders_idx} error(s)":
     {'one': "error en el shader {self.shaders_idx}",
      'many': "{count} errores en el shader {self.shaders_idx}"},
-"shader file {shader_filename} not found": "el fichero de shader {shader_filename} no existe",
+"shader file {shader_filename} not found": "el fichero shader {shader_filename} no existe",
+"shader_filename": "fichero shader",
 "tint_ink": "color",
 }

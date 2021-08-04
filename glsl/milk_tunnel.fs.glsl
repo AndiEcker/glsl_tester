@@ -1,4 +1,4 @@
-uniform float alpha;
+uniform float depth;
 uniform float tex_col_mix;
 uniform float time;
 uniform vec2 win_pos;
@@ -39,8 +39,8 @@ void main()
     }
     t+=5.;
   }
-  //gl_FragColor=c+vec4(.1,.2,.5,alpha)*(t*.025);
-  vec4 col = c+vec4(tint_ink.rgb,alpha)*(t*.025);
+  //gl_FragColor=c+vec4(.1,.2,.5,depth)*(t*.025);
+  vec4 col = c+vec4(tint_ink.rgb,depth*0.3)*(t*.025);
   if (tex_col_mix != 0.0) {
    vec4 tex = texture2D(texture0, tex_coord0);
    col = mix(tex, col, tex_col_mix);
