@@ -33,10 +33,8 @@ from ae.kivy_glsl import BUILT_IN_SHADERS, DEFAULT_FPS, ShaderIdType, shader_par
 from ae.kivy_sideloading import SideloadingMainAppMixin
 
 
-__version__ = '0.2.24'
+__version__ = '0.2.25'
 
-
-SHADER_ERR_MSG = "shader {self.shaders_idx} error(s)"
 
 PosValType = Tuple[float, float]                #: widget window position
 UserInpArgs = Dict[str, Union[Set[str], str]]   #: shader args, lambdas entered by user and shader run/error status
@@ -192,7 +190,7 @@ class GlslTesterApp(SideloadingMainAppMixin, KivyMainApp):
 
         if errors:
             err_msg = "\n".join(errors)
-            self.show_message(err_msg, title=get_txt(SHADER_ERR_MSG, count=len(errors)))
+            self.show_message(err_msg, title=get_txt("shader {self.shaders_idx} error(s)", count=len(errors)))
             self.change_shader_arg('run_state', 'error', error_message=err_msg)
         else:
             shader_id['run_state'] = shader_args['run_state']
