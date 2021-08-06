@@ -1,21 +1,23 @@
-# GlslTester
+# glsl_tester app
 
-GlslTester is a Python multi-platform application project based on the [__Kivy__ Framework](https://kivy.org) and
-the [__ae__ (Application Environment)](https://ae.readthedocs.io "ae on rtd") namespace portions to code and test
-shaders written in GLSL.
+glsl_tester is a Python multi-platform application project to test shaders written in the OpenGL glsl language.
 
-Click on the ... button to select a shader file from the bundled shader examples and touch the + button to run it.
-By clicking on the elliptic button appearing at the top the shader will be removed/stopped. Set the alpha to a value
-below 1.0 if you want to add and mix the output of multiple shaders.
+this app project is based on the [__Kivy__ Framework](https://kivy.org) as well as on the
+[__ae__ (Application Environment)](https://ae.readthedocs.io "ae on rtd") namespace portions.
 
-The bundled shaders from the GLSL Sandbox got adapted with uniform/input parameters. Use the mouse position, the last
-touch position and/or the colors and sliders in the user preferences menu (like vibration/sound volume) to
-dynamically change the input arguments of the running shader(s).
+glsl `uniform` parameter arguments can be synchronized and dynamically changed on running shaders. mix outputs/drawings
+of multiple shaders by using values below 1.0 for the `alpha` (opacity) uniform arguments.
+
+the shader code examples, bundled into this app, got taken from the [__glsl sandbox__](http://glslsandbox.com/). most of
+them got adapted by adding some useful `uniform`/input parameters to control their output dynamically. as dynamic inputs
+can be used e.g. the mouse pointer position, the last touch position(s), key presses and/or the colors and sliders in
+the user preferences menu (like e.g. the vibration and sound volume).
 
 credits to:
 
 * [__Erokia__](https://freesound.org/people/Erokia/) and 
   [__plasterbrain__](https://freesound.org/people/plasterbrain/) at
   [freesound.org](https://freesound.org) for the sounds.
+* [__glsl sandbox__](http://glslsandbox.com/) for glsl shader code examples (see individual copyrights in shader files).
 * [__iconmonstr__](https://iconmonstr.com/interface/) for the icon images.
-* [__glsl sandbox__](http://glslsandbox.com/) for GLSL shader code examples (see individual copyrights in shader files).
+* [__Kivy__](https://kivy.org) for this great multi-platform framework.

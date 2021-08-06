@@ -33,7 +33,7 @@ from ae.kivy_glsl import BUILT_IN_SHADERS, DEFAULT_FPS, ShaderIdType, shader_par
 from ae.kivy_sideloading import SideloadingMainAppMixin
 
 
-__version__ = '0.2.25'
+__version__ = '0.2.26'
 
 
 PosValType = Tuple[float, float]                #: widget window position
